@@ -4,6 +4,7 @@ node_modules/
 # Environment
 .env
 .env.*
+!.env.example
 
 # OS
 .DS_Store
@@ -18,4 +19,9 @@ web-build/
 
 # Build
 build/
+dist/
 *.tsbuildinfo
+
+# Env
+server/.env
+mobile/.env
