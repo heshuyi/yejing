@@ -37,6 +37,7 @@ scripts/         # DB 脚本等
 3. **实现 PR 只含** 该功能代码；不夹带无关重构
 4. **禁止** `git add .`；只 stage 本 PR 计划内文件
 5. **禁止** 未获用户确认就 push / 开 PR（用户明确说「继续」「提交 PR」除外）
+6. **PR 标题与正文必须用中文**（commit message 可英文，便于工具链）
 6. 推送前设置代理（本机 VPN）：
 
 ```bash
@@ -88,10 +89,10 @@ git push -u origin docs/<slug>
 gh pr create --base main --head docs/<slug> \
   --title "docs: <功能名> 设计说明" \
   --body "$(cat <<'EOF'
-## Summary
+## 概要
 - 功能设计规格（无实现代码）
 
-## Test plan
+## 测试清单
 - [ ] 与 PRD 章节一致
 - [ ] API/数据模型完整
 - [ ] 验收标准可执行
@@ -118,14 +119,22 @@ git push -u origin feat/<slug>
 
 ### Step 7：验收
 
-PR body 必须含：
+PR 正文必须含（中文）：
 
 ```markdown
-## Test plan
+## 概要
+- 本 PR 做了什么
+
+## 设计文档
+- docs/features/<slug>.md
+
+## 测试清单
 - [ ] 本地 API 可调用 / Expo 页面可预览
 - [ ] 与设计文档验收标准一致
 - [ ] 无无关文件变更
 ```
+
+用户参与说明见 `docs/PR指南.md`。批量更新/合并 PR 可用 `scripts/github-pr-manage.py`（需代理与 GitHub token）。
 
 ## 分支命名
 
