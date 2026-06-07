@@ -1,0 +1,244 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>野径 — 徒步路线记录 App 原型</title>
+  <style>
+:root {
+  --bg: #ffffff;
+  --surface: #f5f5f7;
+  --fg: #1d1d1f;
+  --muted: #6e6e73;
+  --border: #d2d2d7;
+  --accent: #0071e3;
+  --font-display: "SF Pro Display", "Helvetica Neue", Helvetica, Arial, sans-serif;
+  --font-body: "SF Pro Text", "Helvetica Neue", Helvetica, Arial, sans-serif;
+  --text-sm: 14px;
+  --text-base: 17px;
+  --text-2xl: 40px;
+  --text-3xl: 56px;
+  --radius-lg: 18px;
+  --radius-pill: 980px;
+  --elev-raised: 0 12px 32px rgba(0, 0, 0, 0.08);
+  --space-3: 12px;
+  --space-4: 16px;
+  --space-5: 20px;
+  --space-6: 24px;
+  --space-8: 32px;
+  --space-12: 48px;
+  --section-y-desktop: 100px;
+  --container-max: 1200px;
+  --container-gutter-desktop: 22px;
+}
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+    body {
+      font: var(--text-base)/1.47 var(--font-body);
+      background: var(--bg);
+      color: var(--fg);
+      -webkit-font-smoothing: antialiased;
+    }
+    .wrap {
+      max-width: var(--container-max);
+      margin: 0 auto;
+      padding: var(--section-y-desktop) var(--container-gutter-desktop);
+    }
+    .hero { margin-bottom: var(--space-12); max-width: 720px; }
+    .hero .eyebrow {
+      font: 600 var(--text-sm)/1 var(--font-body);
+      color: var(--muted);
+      letter-spacing: 0.06em;
+      text-transform: uppercase;
+      margin-bottom: var(--space-3);
+    }
+    .hero h1 {
+      font: 600 var(--text-3xl)/1.05 var(--font-display);
+      letter-spacing: -0.015em;
+      margin-bottom: var(--space-4);
+    }
+    .hero p { color: var(--muted); max-width: 60ch; }
+    .hero-links { margin-top: var(--space-5); display: flex; gap: var(--space-4); flex-wrap: wrap; }
+    .hero-links a {
+      color: var(--accent);
+      font-size: var(--text-sm);
+      text-decoration: none;
+      min-height: 44px;
+      display: inline-flex;
+      align-items: center;
+    }
+    .hero-links a:hover { text-decoration: underline; }
+    .features {
+      display: flex;
+      flex-wrap: wrap;
+      gap: var(--space-3);
+      margin-top: var(--space-6);
+    }
+    .tag {
+      padding: var(--space-3) var(--space-4);
+      background: var(--surface);
+      border-radius: var(--radius-pill);
+      font-size: var(--text-sm);
+      color: var(--fg);
+    }
+    .section-head {
+      margin: var(--space-8) 0 var(--space-6);
+      font: 600 21px/1.2 var(--font-display);
+      letter-spacing: -0.015em;
+    }
+    .section-head span { font-size: var(--text-sm); color: var(--muted); font-weight: 400; display: block; margin-top: 4px; }
+    .gallery {
+      display: flex;
+      flex-wrap: wrap;
+      gap: var(--space-8);
+      justify-content: center;
+      align-items: flex-start;
+    }
+    .screen-block {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: var(--space-4);
+    }
+    .screen-block h2 {
+      font: 600 var(--text-base)/1.3 var(--font-body);
+      color: var(--fg);
+    }
+    .screen-block p {
+      font-size: var(--text-sm);
+      color: var(--muted);
+      text-align: center;
+      max-width: 240px;
+    }
+    .phone {
+      width: 390px;
+      height: 844px;
+      border: 0;
+      border-radius: 44px;
+      box-shadow: var(--elev-raised);
+      background: #000;
+    }
+    .phone.wide { width: 100%; max-width: 720px; height: 520px; border-radius: 24px; }
+    .screen-block a {
+      color: var(--accent);
+      font-size: var(--text-sm);
+      text-decoration: none;
+      min-height: 44px;
+      display: inline-flex;
+      align-items: center;
+    }
+    .screen-block a:hover { text-decoration: underline; }
+    footer {
+      margin-top: var(--space-12);
+      padding-top: var(--space-6);
+      border-top: 1px solid var(--border);
+      font-size: var(--text-sm);
+      color: var(--muted);
+    }
+    @media (max-width: 900px) {
+      .hero h1 { font-size: var(--text-2xl); }
+      .wrap { padding: 48px 18px; }
+      .phone { width: 320px; height: 692px; }
+    }
+  </style>
+</head>
+<body>
+  <div class="wrap">
+    <header class="hero">
+      <p class="eyebrow">iOS + watchOS 产品原型 · Apple 设计系统</p>
+      <h1>野径</h1>
+      <p>个人徒步路线记录：GPS 轨迹、补给点与美照位置标记、起终点到达方式，以及与 Apple Watch 同步的健康数据。共 10 个界面，覆盖完整 MVP 闭环。</p>
+      <div class="features">
+        <span class="tag">路线记录</span>
+        <span class="tag">补给 / 美照</span>
+        <span class="tag">路线详情</span>
+        <span class="tag">起终点导航</span>
+        <span class="tag">Watch 健康</span>
+        <span class="tag">watchOS 独立</span>
+      </div>
+      <div class="hero-links">
+        <a href="PRD-野径徒步App.md">📄 产品需求文档 PRD</a>
+      </div>
+    </header>
+
+    <h2 class="section-head">核心流程 <span>首页 → 记录 → 标记 → 回顾</span></h2>
+    <div class="gallery">
+      <div class="screen-block">
+        <h2>01 首页</h2>
+        <iframe class="phone" src="screens_01-home.html" loading="lazy" title="首页"></iframe>
+        <p>进行中徒步、Watch 状态、最近路线、快捷入口</p>
+        <a href="screens_01-home.html" target="_blank">单独打开</a>
+      </div>
+      <div class="screen-block">
+        <h2>02 记录中</h2>
+        <iframe class="phone" src="screens_02-recording.html" loading="lazy" title="记录中"></iframe>
+        <p>实时轨迹、指标、Watch 心率、标记类型选择</p>
+        <a href="screens_02-recording.html" target="_blank">单独打开</a>
+      </div>
+      <div class="screen-block">
+        <h2>03 标记</h2>
+        <iframe class="phone" src="screens_03-markers.html" loading="lazy" title="标记"></iframe>
+        <p>列表/地图切换、补给与美照、摄影字段</p>
+        <a href="screens_03-markers.html" target="_blank">单独打开</a>
+      </div>
+      <div class="screen-block">
+        <h2>06 路线详情</h2>
+        <iframe class="phone" src="screens_06-route-detail.html" loading="lazy" title="路线详情"></iframe>
+        <p>全屏地图、轨迹 Pin、统计、再走一次</p>
+        <a href="screens_06-route-detail.html" target="_blank">单独打开</a>
+      </div>
+    </div>
+
+    <h2 class="section-head">路线管理 <span>规划、列表、到达</span></h2>
+    <div class="gallery">
+      <div class="screen-block">
+        <h2>07 路线库</h2>
+        <iframe class="phone" src="screens_07-route-list.html" loading="lazy" title="路线库"></iframe>
+        <p>搜索筛选、进行中/已完成/草稿</p>
+        <a href="screens_07-route-list.html" target="_blank">单独打开</a>
+      </div>
+      <div class="screen-block">
+        <h2>08 规划路线</h2>
+        <iframe class="phone" src="screens_08-plan-route.html" loading="lazy" title="规划路线"></iframe>
+        <p>起终点、环线、GPX 导入、目标距离</p>
+        <a href="screens_08-plan-route.html" target="_blank">单独打开</a>
+      </div>
+      <div class="screen-block">
+        <h2>04 如何到达</h2>
+        <iframe class="phone" src="screens_04-transit.html" loading="lazy" title="如何到达"></iframe>
+        <p>起终点切换、驾车公交、跳转地图导航</p>
+        <a href="screens_04-transit.html" target="_blank">单独打开</a>
+      </div>
+    </div>
+
+    <h2 class="section-head">Apple Watch <span>iPhone 面板 + watchOS 独立界面</span></h2>
+    <div class="gallery">
+      <div class="screen-block">
+        <h2>05 Watch 面板</h2>
+        <iframe class="phone" src="screens_05-watch.html" loading="lazy" title="Watch 健康"></iframe>
+        <p>心率曲线、同步开关、写入路线</p>
+        <a href="screens_05-watch.html" target="_blank">单独打开</a>
+      </div>
+      <div class="screen-block">
+        <h2>10 watchOS</h2>
+        <iframe class="phone wide" src="screens_10-watch-os.html" loading="lazy" title="watchOS"></iframe>
+        <p>记录表盘、快捷标记、表盘并发症</p>
+        <a href="screens_10-watch-os.html" target="_blank">单独打开</a>
+      </div>
+    </div>
+
+    <h2 class="section-head">设置 <span>权限、导出、设备</span></h2>
+    <div class="gallery">
+      <div class="screen-block">
+        <h2>09 我的</h2>
+        <iframe class="phone" src="screens_09-profile.html" loading="lazy" title="我的"></iframe>
+        <p>Watch 配对、健康权限、GPX 导出、单位制</p>
+        <a href="screens_09-profile.html" target="_blank">单独打开</a>
+      </div>
+    </div>
+
+    <footer>
+      平台：iOS + watchOS · 本地 HTML 原型可直接浏览器预览 · 需求详见 <a href="PRD-野径徒步App.md" style="color:var(--accent)">PRD-野径徒步App.md</a>
+    </footer>
+  </div>
+</body>
+</html>

@@ -1,0 +1,339 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
+  <title>野径 · 记录中</title>
+  <style>
+:root {
+  --bg: #ffffff;
+  --surface: #f5f5f7;
+  --surface-warm: #fbfbfd;
+  --fg: #1d1d1f;
+  --fg-2: #424245;
+  --muted: #6e6e73;
+  --meta: #86868b;
+  --border: #d2d2d7;
+  --border-soft: #e8e8ed;
+  --accent: #0071e3;
+  --accent-on: #ffffff;
+  --accent-hover: #0077ed;
+  --accent-active: #0066cc;
+  --success: #16a34a;
+  --warn: #eab308;
+  --danger: #dc2626;
+  --font-display: "SF Pro Display", "SF Pro Icons", "Helvetica Neue", Helvetica, Arial, sans-serif;
+  --font-body: "SF Pro Text", "SF Pro Icons", "Helvetica Neue", Helvetica, Arial, sans-serif;
+  --font-mono: "SF Mono", ui-monospace, "JetBrains Mono", Menlo, Monaco, Consolas, monospace;
+  --text-xs: 12px;
+  --text-sm: 14px;
+  --text-base: 17px;
+  --text-lg: 21px;
+  --text-xl: 28px;
+  --text-2xl: 40px;
+  --radius-sm: 8px;
+  --radius-md: 12px;
+  --radius-lg: 18px;
+  --radius-pill: 980px;
+  --elev-ring: 0 0 0 1px var(--border);
+  --elev-raised: 0 12px 32px rgba(0, 0, 0, 0.08);
+  --focus-ring: 0 0 0 4px color-mix(in oklab, var(--accent), transparent 65%);
+  --motion-fast: 150ms;
+  --motion-base: 220ms;
+  --ease-standard: cubic-bezier(0.28, 0, 0.22, 1);
+  --space-2: 8px;
+  --space-3: 12px;
+  --space-4: 16px;
+  --space-5: 20px;
+  --space-6: 24px;
+}
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+    html, body {
+      background: var(--bg);
+      color: var(--fg);
+      font: var(--text-base)/1.47 var(--font-body);
+      -webkit-font-smoothing: antialiased;
+    }
+    .app {
+      max-width: 390px;
+      min-height: 844px;
+      margin: 0 auto;
+      display: flex;
+      flex-direction: column;
+      padding: env(safe-area-inset-top, 12px) 0 env(safe-area-inset-bottom, 20px);
+    }
+    .top {
+      padding: var(--space-2) var(--space-4) var(--space-3);
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+    }
+    .top h1 { font: 600 var(--text-lg)/1.2 var(--font-display); letter-spacing: -0.015em; }
+    .rec-badge {
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      font: 600 var(--text-xs)/1 var(--font-body);
+      color: var(--danger);
+      background: color-mix(in oklab, var(--danger), transparent 92%);
+      padding: 6px 10px;
+      border-radius: var(--radius-pill);
+    }
+    .rec-badge .pulse {
+      width: 8px; height: 8px;
+      border-radius: 50%;
+      background: var(--danger);
+      animation: pulse 1.2s ease-in-out infinite;
+    }
+    @keyframes pulse {
+      0%, 100% { opacity: 1; transform: scale(1); }
+      50% { opacity: 0.5; transform: scale(0.85); }
+    }
+    .map {
+      height: 320px;
+      margin: 0 var(--space-4);
+      border-radius: var(--radius-lg);
+      background:
+        linear-gradient(180deg, rgba(0,0,0,0.02), rgba(0,0,0,0.08)),
+        repeating-linear-gradient(0deg, transparent, transparent 23px, var(--border-soft) 23px, var(--border-soft) 24px),
+        repeating-linear-gradient(90deg, transparent, transparent 23px, var(--border-soft) 23px, var(--border-soft) 24px),
+        linear-gradient(160deg, #c8d4c4 0%, #8fa88a 40%, #5a7356 100%);
+      position: relative;
+      overflow: hidden;
+      box-shadow: var(--elev-raised);
+    }
+    .map svg {
+      position: absolute;
+      inset: 0;
+      width: 100%;
+      height: 100%;
+    }
+    .map-pin {
+      position: absolute;
+      bottom: 28%;
+      left: 58%;
+      width: 14px; height: 14px;
+      background: var(--accent);
+      border: 3px solid #fff;
+      border-radius: 50%;
+      box-shadow: 0 2px 8px rgba(0,0,0,0.25);
+    }
+    .stats {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: var(--space-3);
+      padding: var(--space-5) var(--space-4);
+    }
+    .stat {
+      text-align: center;
+      padding: var(--space-3);
+      background: var(--surface);
+      border-radius: var(--radius-md);
+    }
+    .stat .val {
+      font: 600 var(--text-xl)/1.1 var(--font-display);
+      font-variant-numeric: tabular-nums;
+      letter-spacing: -0.015em;
+    }
+    .stat .lbl { font-size: var(--text-xs); color: var(--muted); margin-top: 4px; }
+    .watch-strip {
+      margin: 0 var(--space-4);
+      padding: var(--space-4);
+      background: var(--fg);
+      color: #fff;
+      border-radius: var(--radius-lg);
+      display: flex;
+      align-items: center;
+      gap: var(--space-4);
+    }
+    .hr-ring {
+      width: 52px; height: 52px;
+      border-radius: 50%;
+      border: 3px solid rgba(255,255,255,0.2);
+      border-top-color: #ff6b6b;
+      display: grid;
+      place-items: center;
+      font: 600 var(--text-sm)/1 var(--font-mono);
+      font-variant-numeric: tabular-nums;
+    }
+    .watch-strip .detail { flex: 1; }
+    .watch-strip .detail strong { font: 600 var(--text-base)/1.3 var(--font-body); display: block; }
+    .watch-strip .detail span { font-size: var(--text-sm); color: rgba(255,255,255,0.7); }
+    .controls {
+      margin-top: auto;
+      padding: var(--space-5) var(--space-4);
+      display: flex;
+      gap: var(--space-3);
+      align-items: center;
+      justify-content: center;
+    }
+    .ctrl-round {
+      width: 56px; height: 56px;
+      border-radius: 50%;
+      border: 1px solid var(--border);
+      background: var(--bg);
+      font-size: 22px;
+      cursor: pointer;
+      display: grid;
+      place-items: center;
+      transition: background var(--motion-fast) var(--ease-standard);
+    }
+    .ctrl-round:hover { background: var(--surface); }
+    .ctrl-main {
+      width: 72px; height: 72px;
+      border: 0;
+      border-radius: 50%;
+      background: var(--accent);
+      color: var(--accent-on);
+      font: 600 var(--text-sm)/1 var(--font-body);
+      cursor: pointer;
+      box-shadow: var(--elev-raised);
+      transition: background var(--motion-fast) var(--ease-standard);
+    }
+    .ctrl-main.paused { background: var(--fg); }
+    .ctrl-main:focus-visible { outline: none; box-shadow: var(--focus-ring), var(--elev-raised); }
+    .marker-toast {
+      position: fixed;
+      left: 50%;
+      bottom: 120px;
+      transform: translateX(-50%) translateY(20px);
+      opacity: 0;
+      background: var(--fg);
+      color: #fff;
+      padding: var(--space-3) var(--space-4);
+      border-radius: var(--radius-pill);
+      font-size: var(--text-sm);
+      pointer-events: none;
+      transition: opacity var(--motion-base) var(--ease-standard), transform var(--motion-base) var(--ease-standard);
+    }
+    .marker-toast.show {
+      opacity: 1;
+      transform: translateX(-50%) translateY(0);
+    }
+    .marker-sheet {
+      position: fixed; inset: 0; background: rgba(0,0,0,0.4);
+      display: none; align-items: flex-end; justify-content: center; z-index: 20;
+    }
+    .marker-sheet.open { display: flex; }
+    .marker-sheet-panel {
+      width: 100%; max-width: 390px; background: var(--bg);
+      border-radius: var(--radius-lg) var(--radius-lg) 0 0;
+      padding: var(--space-5) var(--space-4) env(safe-area-inset-bottom, 24px);
+    }
+    .marker-sheet-panel h2 { font: 600 var(--text-lg)/1.2 var(--font-display); margin-bottom: var(--space-4); }
+    .type-quick { display: flex; gap: var(--space-3); margin-bottom: var(--space-4); }
+    .type-quick button {
+      flex: 1; min-height: 72px; border: 1px solid var(--border); border-radius: var(--radius-lg);
+      background: var(--surface); font: 600 var(--text-sm)/1.3 var(--font-body); cursor: pointer;
+    }
+    .type-quick button.on { border-color: var(--accent); background: color-mix(in oklab, var(--accent), transparent 94%); color: var(--accent); }
+    .sheet-save {
+      width: 100%; min-height: 48px; border: 0; border-radius: var(--radius-pill);
+      background: var(--accent); color: var(--accent-on); font: 600 var(--text-base)/1 var(--font-body); cursor: pointer;
+    }
+  </style>
+</head>
+<body>
+  <div class="app">
+    <div class="top">
+      <h1>雾凇岭环线</h1>
+      <span class="rec-badge"><span class="pulse" aria-hidden="true"></span>记录中 01:24:08</span>
+    </div>
+    <div class="map" role="img" aria-label="当前徒步轨迹地图">
+      <svg viewBox="0 0 360 320" preserveAspectRatio="none" aria-hidden="true">
+        <path d="M40 260 Q120 200 160 180 T280 80" fill="none" stroke="#0071e3" stroke-width="5" stroke-linecap="round"/>
+        <path d="M40 260 Q120 200 160 180 T280 80" fill="none" stroke="rgba(255,255,255,0.5)" stroke-width="2" stroke-dasharray="6 8"/>
+      </svg>
+      <span class="map-pin" aria-hidden="true"></span>
+    </div>
+    <div class="stats">
+      <div class="stat"><div class="val" id="dist">4.2</div><div class="lbl">公里</div></div>
+      <div class="stat"><div class="val" id="elev">287</div><div class="lbl">爬升 m</div></div>
+      <div class="stat"><div class="val" id="pace">14:20</div><div class="lbl">配速 /km</div></div>
+    </div>
+    <div class="watch-strip">
+      <div class="hr-ring" id="hr-val">118</div>
+      <div class="detail">
+        <strong>Apple Watch · 户外步行</strong>
+        <span id="hr-zone">心率区间 3 · 有氧耐力</span>
+      </div>
+    </div>
+    <div class="controls">
+      <button type="button" class="ctrl-round" id="add-marker" aria-label="添加标记">+</button>
+      <button type="button" class="ctrl-main" id="pause-btn">暂停</button>
+      <button type="button" class="ctrl-round" id="end-hike" aria-label="结束徒步">■</button>
+    </div>
+    <div class="marker-toast" id="toast" role="status">已记录当前位置</div>
+  </div>
+
+  <div class="marker-sheet" id="marker-sheet" role="dialog" aria-modal="true" aria-labelledby="marker-sheet-title" hidden>
+    <div class="marker-sheet-panel">
+      <h2 id="marker-sheet-title">添加标记</h2>
+      <p style="font-size:var(--text-sm);color:var(--muted);margin-bottom:var(--space-4)">当前 GPS 位置 · 4.2 km 处</p>
+      <div class="type-quick" role="group" aria-label="标记类型">
+        <button type="button" class="on" data-type="supply">补给点</button>
+        <button type="button" data-type="photo">美照位置</button>
+        <button type="button" data-type="rest">休息点</button>
+      </div>
+      <button type="button" class="sheet-save" id="save-quick-marker">记录此位置</button>
+    </div>
+  </div>
+
+  <script>
+    (function () {
+      var paused = false;
+      var pauseBtn = document.getElementById('pause-btn');
+      var hr = 118;
+      var hrEl = document.getElementById('hr-val');
+      var toast = document.getElementById('toast');
+      var markerSheet = document.getElementById('marker-sheet');
+      var selectedType = 'supply';
+      var typeLabels = { supply: '补给点', photo: '美照位置', rest: '休息点' };
+
+      pauseBtn.addEventListener('click', function () {
+        paused = !paused;
+        pauseBtn.textContent = paused ? '继续' : '暂停';
+        pauseBtn.classList.toggle('paused', paused);
+      });
+      document.getElementById('add-marker').addEventListener('click', function () {
+        markerSheet.hidden = false;
+        markerSheet.classList.add('open');
+      });
+      document.querySelectorAll('.type-quick button').forEach(function (btn) {
+        btn.addEventListener('click', function () {
+          document.querySelectorAll('.type-quick button').forEach(function (b) { b.classList.remove('on'); });
+          btn.classList.add('on');
+          selectedType = btn.dataset.type;
+        });
+      });
+      document.getElementById('save-quick-marker').addEventListener('click', function () {
+        markerSheet.classList.remove('open');
+        markerSheet.hidden = true;
+        toast.textContent = '已记录 · ' + typeLabels[selectedType];
+        toast.classList.add('show');
+        setTimeout(function () { toast.classList.remove('show'); }, 2200);
+      });
+      markerSheet.addEventListener('click', function (e) {
+        if (e.target === markerSheet) {
+          markerSheet.classList.remove('open');
+          markerSheet.hidden = true;
+        }
+      });
+      document.getElementById('end-hike').addEventListener('click', function () {
+        if (confirm('结束本次徒步并保存路线？')) {
+          pauseBtn.textContent = '已保存';
+          pauseBtn.classList.add('paused');
+          pauseBtn.disabled = true;
+        }
+      });
+      setInterval(function () {
+        if (paused) return;
+        hr = 112 + Math.floor(Math.random() * 18);
+        hrEl.textContent = hr;
+        document.getElementById('hr-zone').textContent =
+          hr < 120 ? '心率区间 2 · 燃脂' : hr < 140 ? '心率区间 3 · 有氧耐力' : '心率区间 4 · 无氧';
+      }, 3000);
+    })();
+  </script>
+</body>
+</html>

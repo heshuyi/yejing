@@ -1,0 +1,151 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
+  <title>野径 · 规划路线</title>
+  <style>
+:root {
+  --bg: #ffffff; --surface: #f5f5f7; --fg: #1d1d1f; --muted: #6e6e73; --meta: #86868b;
+  --border: #d2d2d7; --border-soft: #e8e8ed; --accent: #0071e3; --accent-on: #ffffff;
+  --success: #16a34a;
+  --font-display: "SF Pro Display", "Helvetica Neue", Helvetica, Arial, sans-serif;
+  --font-body: "SF Pro Text", "Helvetica Neue", Helvetica, Arial, sans-serif;
+  --text-xs: 12px; --text-sm: 14px; --text-base: 17px; --text-lg: 21px;
+  --radius-sm: 8px; --radius-md: 12px; --radius-lg: 18px; --radius-pill: 980px;
+  --elev-raised: 0 12px 32px rgba(0,0,0,0.08);
+  --focus-ring: 0 0 0 4px color-mix(in oklab, var(--accent), transparent 65%);
+  --space-2: 8px; --space-3: 12px; --space-4: 16px; --space-5: 20px;
+}
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+    body { font: var(--text-base)/1.47 var(--font-body); background: var(--bg); color: var(--fg); }
+    .app {
+      max-width: 390px; min-height: 844px; margin: 0 auto;
+      padding: env(safe-area-inset-top, 12px) var(--space-4) env(safe-area-inset-bottom, 24px);
+      display: flex; flex-direction: column; gap: var(--space-4);
+    }
+    .nav-row { display: flex; align-items: center; gap: var(--space-3); padding-top: var(--space-2); }
+    .back { min-width: 44px; min-height: 44px; border: 0; background: none; font-size: 22px; color: var(--accent); cursor: pointer; }
+    h1 { font: 600 var(--text-lg)/1.2 var(--font-display); flex: 1; }
+    .steps { display: flex; gap: var(--space-2); }
+    .step { flex: 1; height: 4px; border-radius: 2px; background: var(--border-soft); }
+    .step.done { background: var(--accent); }
+    .map-pick {
+      height: 200px; border-radius: var(--radius-lg); position: relative; overflow: hidden;
+      background: linear-gradient(160deg, #c8d4c4, #5a7356);
+      box-shadow: var(--elev-raised);
+    }
+    .map-pick .pin-start, .map-pick .pin-end {
+      position: absolute; padding: 4px 10px; border-radius: var(--radius-pill);
+      font: 600 var(--text-xs)/1 var(--font-body); color: #fff; box-shadow: var(--elev-raised);
+    }
+    .pin-start { background: var(--success); left: 18%; top: 55%; }
+    .pin-end { background: var(--accent); right: 15%; top: 25%; }
+    .field { margin-bottom: var(--space-3); }
+    .field label { display: block; font-size: var(--text-sm); color: var(--muted); margin-bottom: var(--space-2); }
+    .field input, .field select {
+      width: 100%; padding: var(--space-3); border: 1px solid var(--border);
+      border-radius: var(--radius-sm); font: var(--text-base)/1.47 var(--font-body);
+    }
+    .field input:focus-visible, .field select:focus-visible { outline: none; box-shadow: var(--focus-ring); border-color: var(--accent); }
+    .toggle-row {
+      display: flex; justify-content: space-between; align-items: center;
+      padding: var(--space-4); background: var(--surface); border-radius: var(--radius-lg);
+    }
+    .toggle-row span { font-size: var(--text-sm); color: var(--muted); display: block; margin-top: 2px; }
+    .switch {
+      width: 51px; height: 31px; border-radius: var(--radius-pill); background: var(--accent);
+      border: 0; position: relative; cursor: pointer;
+    }
+    .switch::after {
+      content: ''; position: absolute; top: 2px; left: 22px; width: 27px; height: 27px;
+      background: #fff; border-radius: 50%; box-shadow: 0 2px 4px rgba(0,0,0,0.2);
+    }
+    .switch.off { background: var(--border); }
+    .switch.off::after { left: 2px; }
+    .import-box {
+      border: 2px dashed var(--border); border-radius: var(--radius-lg);
+      padding: var(--space-5); text-align: center; color: var(--muted); font-size: var(--text-sm); cursor: pointer;
+    }
+    .import-box strong { display: block; color: var(--fg); font-size: var(--text-base); margin-bottom: var(--space-2); }
+    .actions { margin-top: auto; display: flex; flex-direction: column; gap: var(--space-3); }
+    .btn {
+      min-height: 50px; border-radius: var(--radius-pill); font: 600 var(--text-base)/1 var(--font-body); cursor: pointer;
+    }
+    .btn.primary { border: 0; background: var(--accent); color: var(--accent-on); }
+    .btn.ghost { border: 0; background: none; color: var(--accent); min-height: 44px; }
+  </style>
+</head>
+<body>
+  <div class="app">
+    <div class="nav-row">
+      <button type="button" class="back" aria-label="返回">‹</button>
+      <h1>规划新路线</h1>
+    </div>
+    <div class="steps" aria-hidden="true">
+      <div class="step done"></div><div class="step done"></div><div class="step"></div>
+    </div>
+
+    <div class="field">
+      <label for="name">路线名称</label>
+      <input id="name" type="text" placeholder="例如：雾凇岭环线" value="雾凇岭环线" />
+    </div>
+
+    <div class="map-pick" role="img" aria-label="在地图上选择起终点">
+      <span class="pin-start">起点</span>
+      <span class="pin-end">终点</span>
+    </div>
+    <p style="font-size:var(--text-sm);color:var(--muted)">点击地图设置起点与终点 · 支持环线（终点=起点）</p>
+
+    <div class="field">
+      <label for="start">起点名称</label>
+      <input id="start" type="text" placeholder="停车场、公交站…" value="雾凇岭停车场 P2" />
+    </div>
+    <div class="field">
+      <label for="end">终点名称</label>
+      <input id="end" type="text" placeholder="可与起点相同（环线）" value="九溪公交站" />
+    </div>
+
+    <div class="toggle-row">
+      <div><strong>环线模式</strong><span>终点自动对齐起点</span></div>
+      <button type="button" class="switch off" id="loop-switch" aria-pressed="false" aria-label="环线模式"></button>
+    </div>
+
+    <div class="import-box" id="gpx-import" tabindex="0" role="button">
+      <strong>导入 GPX 参考轨迹</strong>
+      可选 · 用于预览路线走向
+    </div>
+
+    <div class="field">
+      <label for="goal">目标距离（可选）</label>
+      <select id="goal">
+        <option>不设定</option>
+        <option>5–10 km</option>
+        <option selected>10–15 km</option>
+        <option>15–25 km</option>
+        <option>25 km 以上</option>
+      </select>
+    </div>
+
+    <div class="actions">
+      <button type="button" class="btn primary" id="save">保存并开始规划到达</button>
+      <button type="button" class="btn ghost">仅保存草稿</button>
+    </div>
+  </div>
+  <script>
+    document.getElementById('loop-switch').addEventListener('click', function () {
+      var off = this.classList.toggle('off');
+      this.setAttribute('aria-pressed', String(!off));
+      if (!off) document.getElementById('end').value = document.getElementById('start').value;
+    });
+    document.getElementById('gpx-import').addEventListener('click', function () {
+      this.innerHTML = '<strong>已选择 trail.gpx</strong>2.4 MB · 128 轨迹点';
+    });
+    document.getElementById('save').addEventListener('click', function () {
+      this.textContent = '已保存 · 跳转如何到达…';
+      var self = this;
+      setTimeout(function () { self.textContent = '保存并开始规划到达'; }, 1500);
+    });
+  </script>
+</body>
+</html>

@@ -1,0 +1,175 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>野径 · watchOS 记录</title>
+  <style>
+:root {
+  --bg: #000; --surface: #1c1c1e; --fg: #fff; --muted: #8e8e93;
+  --accent: #30d158; --accent-blue: #0a84ff; --warn: #ff9f0a; --danger: #ff453a;
+  --font-display: "SF Pro Display", "Helvetica Neue", Helvetica, Arial, sans-serif;
+  --font-body: "SF Pro Text", "Helvetica Neue", Helvetica, Arial, sans-serif;
+  --font-mono: "SF Mono", ui-monospace, Menlo, monospace;
+}
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+    body {
+      min-height: 100vh; background: #f5f5f7;
+      font: 17px/1.47 var(--font-body);
+      display: flex; flex-direction: column; align-items: center;
+      justify-content: center; gap: 32px; padding: 40px 20px;
+      -webkit-font-smoothing: antialiased;
+    }
+    .page-title { text-align: center; max-width: 400px; }
+    .page-title h1 { font: 600 21px/1.2 var(--font-display); color: #1d1d1f; }
+    .page-title p { font-size: 14px; color: #6e6e73; margin-top: 8px; }
+    .watch-frame {
+      width: 198px; height: 242px; border-radius: 48px; padding: 14px;
+      background: linear-gradient(145deg, #3a3a3c, #1c1c1e);
+      box-shadow: 0 20px 50px rgba(0,0,0,0.25), inset 0 0 0 2px #48484a;
+      position: relative;
+    }
+    .watch-screen {
+      width: 100%; height: 100%; border-radius: 36px; overflow: hidden;
+      background: var(--bg); color: var(--fg);
+      display: flex; flex-direction: column;
+    }
+    .screen-label {
+      font: 600 12px/1 var(--font-body); color: #6e6e73;
+      text-transform: uppercase; letter-spacing: 0.06em;
+      margin-top: 8px; text-align: center;
+    }
+    .gallery { display: flex; flex-wrap: wrap; gap: 40px; justify-content: center; }
+
+    /* Screen 1: Recording */
+    .rec-top { padding: 12px 10px 4px; text-align: center; }
+    .rec-top .route { font-size: 11px; color: var(--muted); }
+    .rec-top .time { font: 600 11px/1 var(--font-mono); color: var(--danger); margin-top: 4px; }
+    .rec-main { flex: 1; display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 2px; }
+    .rec-main .big { font: 600 36px/1 var(--font-display); font-variant-numeric: tabular-nums; }
+    .rec-main .unit { font-size: 13px; color: var(--muted); }
+    .rec-row { display: flex; gap: 16px; font-size: 11px; color: var(--muted); margin-top: 8px; }
+    .rec-row strong { display: block; color: var(--fg); font: 600 15px/1 var(--font-mono); }
+    .rec-hr { width: 100%; padding: 8px 12px; background: var(--surface); display: flex; align-items: center; gap: 8px; font-size: 11px; }
+    .rec-hr .ring { width: 28px; height: 28px; border-radius: 50%; border: 2px solid #ff6b6b; display: grid; place-items: center; font: 600 10px/1 var(--font-mono); }
+    .rec-actions { display: flex; padding: 8px; gap: 6px; }
+    .rec-actions button {
+      flex: 1; min-height: 36px; border: 0; border-radius: 18px;
+      font: 600 12px/1 var(--font-body); cursor: pointer;
+    }
+    .btn-mark { background: var(--accent-blue); color: #fff; }
+    .btn-pause { background: var(--surface); color: #fff; }
+
+    /* Screen 2: Mark picker */
+    .mark-list { flex: 1; padding: 10px; display: flex; flex-direction: column; gap: 6px; }
+    .mark-opt {
+      padding: 10px; border-radius: 12px; background: var(--surface);
+      font: 600 14px/1.2 var(--font-body); text-align: center; cursor: pointer;
+    }
+    .mark-opt.selected { background: var(--accent-blue); }
+    .mark-opt small { display: block; font-size: 10px; color: var(--muted); font-weight: 400; margin-top: 4px; }
+    .mark-opt.selected small { color: rgba(255,255,255,0.7); }
+
+    /* Screen 3: Complication */
+    .comp { flex: 1; display: grid; place-items: center; padding: 16px; }
+    .comp-ring {
+      width: 120px; height: 120px; border-radius: 50%;
+      background: conic-gradient(var(--accent) 0deg 220deg, #333 220deg 360deg);
+      display: grid; place-items: center;
+    }
+    .comp-inner {
+      width: 88px; height: 88px; border-radius: 50%; background: #000;
+      display: flex; flex-direction: column; align-items: center; justify-content: center;
+      font-size: 10px; color: var(--muted);
+    }
+    .comp-inner strong { font: 600 18px/1 var(--font-display); color: #fff; }
+  </style>
+</head>
+<body>
+  <div class="page-title">
+    <h1>watchOS 界面</h1>
+    <p>独立记录、快捷标记、表盘并发症 — 徒步时无需掏手机</p>
+  </div>
+
+  <div class="gallery">
+    <div>
+      <div class="watch-frame">
+        <div class="watch-screen">
+          <div class="rec-top">
+            <div class="route">雾凇岭环线</div>
+            <div class="time">● 01:24:08</div>
+          </div>
+          <div class="rec-main">
+            <div class="big" id="w-dist">4.2</div>
+            <div class="unit">公里</div>
+            <div class="rec-row">
+              <div><strong id="w-elev">287</strong>爬升 m</div>
+              <div><strong id="w-pace">14:20</strong>配速</div>
+            </div>
+          </div>
+          <div class="rec-hr">
+            <div class="ring" id="w-hr">118</div>
+            <span>有氧耐力</span>
+          </div>
+          <div class="rec-actions">
+            <button type="button" class="btn-mark" id="w-mark">标记</button>
+            <button type="button" class="btn-pause" id="w-pause">暂停</button>
+          </div>
+        </div>
+      </div>
+      <p class="screen-label">记录中</p>
+    </div>
+
+    <div>
+      <div class="watch-frame">
+        <div class="watch-screen">
+          <div class="rec-top"><div class="route">选择标记类型</div></div>
+          <div class="mark-list">
+            <div class="mark-opt selected" data-type="supply">补给点<small>水站、小卖部</small></div>
+            <div class="mark-opt" data-type="photo">美照位置<small>拍照、朝向</small></div>
+            <div class="mark-opt" data-type="rest">休息点<small>凉亭、平台</small></div>
+          </div>
+          <div class="rec-actions">
+            <button type="button" class="btn-mark" style="flex:1">确认记录</button>
+          </div>
+        </div>
+      </div>
+      <p class="screen-label">快捷标记</p>
+    </div>
+
+    <div>
+      <div class="watch-frame">
+        <div class="watch-screen">
+          <div class="comp">
+            <div class="comp-ring">
+              <div class="comp-inner">
+                <strong>4.2</strong>
+                <span>km · 野径</span>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+      <p class="screen-label">表盘并发症</p>
+    </div>
+  </div>
+
+  <script>
+    document.querySelectorAll('.mark-opt').forEach(function (el) {
+      el.addEventListener('click', function () {
+        document.querySelectorAll('.mark-opt').forEach(function (o) { o.classList.remove('selected'); });
+        el.classList.add('selected');
+      });
+    });
+    var paused = false;
+    document.getElementById('w-pause').addEventListener('click', function () {
+      paused = !paused;
+      this.textContent = paused ? '继续' : '暂停';
+    });
+    setInterval(function () {
+      if (paused) return;
+      document.getElementById('w-hr').textContent = 110 + Math.floor(Math.random() * 20);
+    }, 3000);
+  </script>
+</body>
+</html>
