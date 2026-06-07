@@ -5,7 +5,7 @@ const conn = new Mongo();
 const db = conn.getDB(DB_NAME);
 
 // ── 1. 清空旧数据（开发环境） ──
-['routes', 'markers', 'track_points', 'health_sessions'].forEach((c) => {
+['routes', 'markers', 'track_points', 'health_sessions', 'users'].forEach((c) => {
   db[c].drop();
 });
 
@@ -83,6 +83,9 @@ db.track_points.createIndex({ routeId: 1, timestamp: 1 });
 db.track_points.createIndex({ location: '2dsphere' });
 
 db.health_sessions.createIndex({ routeId: 1 }, { unique: true });
+
+db.createCollection('users');
+db.users.createIndex({ email: 1 }, { unique: true });
 
 // ── 4. 测试数据 ──
 const now = new Date();
