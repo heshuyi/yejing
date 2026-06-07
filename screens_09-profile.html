@@ -1,0 +1,111 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
+  <title>野径 · 我的</title>
+  <style>
+:root {
+  --bg: #ffffff; --surface: #f5f5f7; --fg: #1d1d1f; --fg-2: #424245;
+  --muted: #6e6e73; --border: #d2d2d7; --border-soft: #e8e8ed;
+  --accent: #0071e3; --success: #16a34a;
+  --font-display: "SF Pro Display", "Helvetica Neue", Helvetica, Arial, sans-serif;
+  --font-body: "SF Pro Text", "Helvetica Neue", Helvetica, Arial, sans-serif;
+  --text-xs: 12px; --text-sm: 14px; --text-base: 17px; --text-lg: 21px;
+  --radius-md: 12px; --radius-lg: 18px; --radius-pill: 980px;
+  --space-2: 8px; --space-3: 12px; --space-4: 16px; --space-5: 20px;
+}
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+    body { font: var(--text-base)/1.47 var(--font-body); background: var(--bg); color: var(--fg); }
+    .app {
+      max-width: 390px; min-height: 844px; margin: 0 auto;
+      padding: env(safe-area-inset-top, 12px) var(--space-4) env(safe-area-inset-bottom, 24px);
+      display: flex; flex-direction: column; gap: var(--space-5);
+    }
+    h1 { font: 600 var(--text-lg)/1.2 var(--font-display); padding-top: var(--space-2); }
+    .stats {
+      display: grid; grid-template-columns: repeat(3, 1fr); gap: var(--space-3);
+      padding: var(--space-4); background: var(--surface); border-radius: var(--radius-lg);
+    }
+    .stats div { text-align: center; }
+    .stats strong { display: block; font: 600 var(--text-lg)/1.2 var(--font-display); font-variant-numeric: tabular-nums; }
+    .stats span { font-size: var(--text-xs); color: var(--muted); }
+    .group h2 {
+      font: 600 var(--text-sm)/1 var(--font-body); color: var(--muted);
+      text-transform: uppercase; letter-spacing: 0.06em; margin-bottom: var(--space-3);
+    }
+    .rows { background: var(--surface); border-radius: var(--radius-lg); overflow: hidden; }
+    .row {
+      display: flex; align-items: center; justify-content: space-between;
+      padding: var(--space-4); border-bottom: 1px solid var(--border-soft);
+      cursor: pointer; min-height: 52px;
+    }
+    .row:last-child { border-bottom: 0; }
+    .row .left { display: flex; flex-direction: column; gap: 2px; }
+    .row .left span { font-size: var(--text-sm); color: var(--muted); }
+    .row .chev { color: var(--muted); }
+    .badge-ok { font-size: var(--text-sm); color: var(--success); font-weight: 600; }
+    .tabbar {
+      display: flex; justify-content: space-around; padding: var(--space-3) 0;
+      border-top: 1px solid var(--border-soft); margin-top: auto;
+    }
+    .tabbar button { background: none; border: 0; font: 600 var(--text-xs)/1 var(--font-body); color: var(--muted); min-height: 44px; cursor: pointer; }
+    .tabbar button.active { color: var(--accent); }
+    .version { text-align: center; font-size: var(--text-xs); color: var(--muted); }
+  </style>
+</head>
+<body>
+  <div class="app">
+    <h1>我的</h1>
+    <div class="stats">
+      <div><strong>24</strong><span>条路线</span></div>
+      <div><strong>186</strong><span>公里</span></div>
+      <div><strong>47</strong><span>个标记</span></div>
+    </div>
+
+    <section class="group">
+      <h2>设备与同步</h2>
+      <div class="rows">
+        <div class="row"><div class="left"><strong>Apple Watch</strong><span>Ultra 2 · 已配对</span></div><span class="badge-ok">已连接</span></div>
+        <div class="row"><div class="left"><strong>健康数据权限</strong><span>心率、血氧、体能训练</span></div><span class="chev">›</span></div>
+        <div class="row"><div class="left"><strong>独立记录</strong><span>无 iPhone 时 Watch 可单独记录</span></div><span class="chev">›</span></div>
+      </div>
+    </section>
+
+    <section class="group">
+      <h2>地图与记录</h2>
+      <div class="rows">
+        <div class="row"><div class="left"><strong>定位权限</strong><span>始终允许 · 后台记录</span></div><span class="badge-ok">已开启</span></div>
+        <div class="row"><div class="left"><strong>地图样式</strong><span>标准地图</span></div><span class="chev">›</span></div>
+        <div class="row"><div class="left"><strong>单位制</strong><span>公制（公里 / 米）</span></div><span class="chev">›</span></div>
+        <div class="row"><div class="left"><strong>离线地图</strong><span>v1.1 即将推出</span></div><span class="chev">›</span></div>
+      </div>
+    </section>
+
+    <section class="group">
+      <h2>数据</h2>
+      <div class="rows">
+        <div class="row"><div class="left"><strong>导出全部 GPX</strong><span>24 条路线</span></div><span class="chev">›</span></div>
+        <div class="row"><div class="left"><strong>iCloud 备份</strong><span>上次：今天 08:12</span></div><span class="chev">›</span></div>
+      </div>
+    </section>
+
+    <section class="group">
+      <h2>关于</h2>
+      <div class="rows">
+        <div class="row"><div class="left"><strong>隐私政策</strong></div><span class="chev">›</span></div>
+        <div class="row"><div class="left"><strong>用户协议</strong></div><span class="chev">›</span></div>
+      </div>
+    </section>
+
+    <p class="version">野径 v1.0.0 · 个人徒步档案</p>
+
+    <nav class="tabbar" aria-label="主导航">
+      <button type="button">首页</button>
+      <button type="button">路线</button>
+      <button type="button">地图</button>
+      <button type="button" class="active" aria-current="page">我的</button>
+    </nav>
+  </div>
+</body>
+</html>

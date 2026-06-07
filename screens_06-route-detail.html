@@ -1,0 +1,143 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
+  <title>野径 · 路线详情</title>
+  <style>
+:root {
+  --bg: #ffffff; --surface: #f5f5f7; --fg: #1d1d1f; --fg-2: #424245;
+  --muted: #6e6e73; --meta: #86868b; --border: #d2d2d7; --border-soft: #e8e8ed;
+  --accent: #0071e3; --accent-on: #ffffff; --success: #16a34a; --warn: #eab308;
+  --font-display: "SF Pro Display", "Helvetica Neue", Helvetica, Arial, sans-serif;
+  --font-body: "SF Pro Text", "Helvetica Neue", Helvetica, Arial, sans-serif;
+  --font-mono: "SF Mono", ui-monospace, Menlo, monospace;
+  --text-xs: 12px; --text-sm: 14px; --text-base: 17px; --text-lg: 21px; --text-xl: 28px;
+  --radius-sm: 8px; --radius-md: 12px; --radius-lg: 18px; --radius-pill: 980px;
+  --elev-raised: 0 12px 32px rgba(0,0,0,0.08);
+  --motion-fast: 150ms; --ease-standard: cubic-bezier(0.28,0,0.22,1);
+  --space-2: 8px; --space-3: 12px; --space-4: 16px; --space-5: 20px;
+}
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+    body { font: var(--text-base)/1.47 var(--font-body); background: var(--bg); color: var(--fg); -webkit-font-smoothing: antialiased; }
+    .app { max-width: 390px; min-height: 844px; margin: 0 auto; display: flex; flex-direction: column; position: relative; }
+    .map-full {
+      height: 420px; position: relative; overflow: hidden;
+      background: linear-gradient(160deg, #c8d4c4 0%, #8fa88a 40%, #5a7356 100%);
+    }
+    .map-full svg { position: absolute; inset: 0; width: 100%; height: 100%; }
+    .pin {
+      position: absolute; width: 12px; height: 12px; border-radius: 50%;
+      border: 2px solid #fff; box-shadow: 0 2px 6px rgba(0,0,0,0.3);
+    }
+    .pin.supply { background: var(--accent); }
+    .pin.photo { background: var(--success); }
+    .pin.view { background: #06b6d4; }
+    .map-overlay {
+      position: absolute; top: env(safe-area-inset-top, 12px); left: var(--space-4); right: var(--space-4);
+      display: flex; align-items: center; gap: var(--space-3);
+    }
+    .back, .share-btn {
+      min-width: 40px; min-height: 40px; border: 0; border-radius: 50%;
+      background: rgba(255,255,255,0.92); backdrop-filter: blur(8px);
+      font-size: 20px; color: var(--accent); cursor: pointer;
+      box-shadow: var(--elev-raised); display: grid; place-items: center;
+    }
+    .share-btn { margin-left: auto; font-size: var(--text-sm); font-weight: 600; width: auto; padding: 0 var(--space-3); border-radius: var(--radius-pill); }
+    .sheet {
+      margin-top: -28px; flex: 1; background: var(--bg);
+      border-radius: var(--radius-lg) var(--radius-lg) 0 0;
+      padding: var(--space-5) var(--space-4) env(safe-area-inset-bottom, 24px);
+      box-shadow: 0 -4px 24px rgba(0,0,0,0.06);
+      display: flex; flex-direction: column; gap: var(--space-4);
+    }
+    .drag { width: 36px; height: 5px; background: var(--border); border-radius: 3px; margin: 0 auto var(--space-2); }
+    h1 { font: 600 var(--text-xl)/1.15 var(--font-display); letter-spacing: -0.015em; }
+    .meta-row { display: flex; gap: var(--space-4); font-size: var(--text-sm); color: var(--muted); flex-wrap: wrap; }
+    .meta-row strong { display: block; font: 600 var(--text-lg)/1.2 var(--font-display); color: var(--fg); font-variant-numeric: tabular-nums; }
+    .legend { display: flex; gap: var(--space-3); flex-wrap: wrap; }
+    .legend span { font-size: var(--text-xs); color: var(--fg-2); display: inline-flex; align-items: center; gap: 6px; }
+    .legend i { width: 8px; height: 8px; border-radius: 50%; display: inline-block; }
+    .markers-scroll { display: flex; gap: var(--space-3); overflow-x: auto; padding-bottom: var(--space-2); scrollbar-width: none; }
+    .markers-scroll::-webkit-scrollbar { display: none; }
+    .mini-card {
+      flex: 0 0 140px; padding: var(--space-3); border: 1px solid var(--border-soft);
+      border-radius: var(--radius-md); background: var(--surface); cursor: pointer;
+    }
+    .mini-card h3 { font: 600 var(--text-sm)/1.3 var(--font-body); }
+    .mini-card p { font-size: var(--text-xs); color: var(--muted); margin-top: 4px; }
+    .actions { display: grid; grid-template-columns: 1fr 1fr; gap: var(--space-3); margin-top: auto; }
+    .btn {
+      min-height: 48px; border-radius: var(--radius-pill); font: 600 var(--text-base)/1 var(--font-body); cursor: pointer;
+    }
+    .btn.primary { border: 0; background: var(--accent); color: var(--accent-on); }
+    .btn.secondary { border: 1px solid var(--border); background: var(--bg); color: var(--fg); }
+    .hr-mini {
+      height: 48px; background: var(--surface); border-radius: var(--radius-md);
+      display: flex; align-items: center; gap: var(--space-3); padding: 0 var(--space-3);
+      font-size: var(--text-sm); color: var(--muted);
+    }
+    .hr-mini svg { flex: 1; height: 32px; }
+  </style>
+</head>
+<body>
+  <div class="app">
+    <div class="map-full" role="img" aria-label="雾凇岭环线轨迹与标记地图">
+      <svg viewBox="0 0 390 420" preserveAspectRatio="none" aria-hidden="true">
+        <path d="M30 380 Q100 300 150 260 T320 80" fill="none" stroke="#0071e3" stroke-width="4" stroke-linecap="round"/>
+      </svg>
+      <span class="pin supply" style="left:28%;top:62%"></span>
+      <span class="pin photo" style="left:45%;top:48%"></span>
+      <span class="pin supply" style="left:58%;top:38%"></span>
+      <span class="pin view" style="left:72%;top:28%"></span>
+      <div class="map-overlay">
+        <button type="button" class="back" aria-label="返回">‹</button>
+        <button type="button" class="share-btn">导出 GPX</button>
+      </div>
+    </div>
+    <div class="sheet">
+      <div class="drag" aria-hidden="true"></div>
+      <h1>雾凇岭环线</h1>
+      <p style="font-size:var(--text-sm);color:var(--muted)">2026年6月1日 · 已完成 · 单段</p>
+      <div class="meta-row">
+        <div><strong>12.4</strong>公里</div>
+        <div><strong>687</strong>米爬升</div>
+        <div><strong>4h 12m</strong>时长</div>
+        <div><strong>118</strong>均心率</div>
+      </div>
+      <div class="legend">
+        <span><i style="background:var(--accent)"></i>补给 2</span>
+        <span><i style="background:var(--success)"></i>美照 1</span>
+        <span><i style="background:#06b6d4"></i>观景 1</span>
+      </div>
+      <div class="hr-mini">
+        <span>心率</span>
+        <svg viewBox="0 0 200 32" preserveAspectRatio="none" aria-hidden="true">
+          <path d="M0 20 L20 18 L40 22 L60 12 L80 16 L100 8 L120 14 L140 10 L160 18 L180 12 L200 16" fill="none" stroke="#0071e3" stroke-width="2"/>
+        </svg>
+        <strong style="color:var(--fg)">118</strong>
+      </div>
+      <section>
+        <h2 style="font:600 var(--text-sm)/1 var(--font-body);color:var(--muted);text-transform:uppercase;letter-spacing:0.06em;margin-bottom:var(--space-3)">沿途标记</h2>
+        <div class="markers-scroll">
+          <div class="mini-card"><h3>山泉水站</h3><p>2.1 km · 补给</p></div>
+          <div class="mini-card"><h3>观景台</h3><p>3.8 km · 美照 · 东南</p></div>
+          <div class="mini-card"><h3>驿站小卖部</h3><p>5.4 km · 补给</p></div>
+          <div class="mini-card"><h3>冷杉林道口</h3><p>6.2 km · 观景</p></div>
+        </div>
+      </section>
+      <div class="actions">
+        <button type="button" class="btn secondary">如何到达</button>
+        <button type="button" class="btn primary" id="redo">再走一次</button>
+      </div>
+    </div>
+  </div>
+  <script>
+    document.getElementById('redo').addEventListener('click', function () {
+      this.textContent = '正在创建…';
+      var self = this;
+      setTimeout(function () { self.textContent = '再走一次'; }, 1000);
+    });
+  </script>
+</body>
+</html>

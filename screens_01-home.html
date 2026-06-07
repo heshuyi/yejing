@@ -1,0 +1,332 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
+  <title>野径 · 首页</title>
+  <style>
+:root {
+  --bg: #ffffff;
+  --surface: #f5f5f7;
+  --surface-warm: #fbfbfd;
+  --fg: #1d1d1f;
+  --fg-2: #424245;
+  --muted: #6e6e73;
+  --meta: #86868b;
+  --border: #d2d2d7;
+  --border-soft: #e8e8ed;
+  --accent: #0071e3;
+  --accent-on: #ffffff;
+  --accent-hover: #0077ed;
+  --accent-active: #0066cc;
+  --success: #16a34a;
+  --warn: #eab308;
+  --danger: #dc2626;
+  --font-display: "SF Pro Display", "SF Pro Icons", "Helvetica Neue", Helvetica, Arial, sans-serif;
+  --font-body: "SF Pro Text", "SF Pro Icons", "Helvetica Neue", Helvetica, Arial, sans-serif;
+  --font-mono: "SF Mono", ui-monospace, "JetBrains Mono", Menlo, Monaco, Consolas, monospace;
+  --text-xs: 12px;
+  --text-sm: 14px;
+  --text-base: 17px;
+  --text-lg: 21px;
+  --text-xl: 28px;
+  --text-2xl: 40px;
+  --text-3xl: 56px;
+  --text-4xl: 80px;
+  --leading-body: 1.47;
+  --leading-tight: 1.05;
+  --tracking-display: -0.015em;
+  --space-1: 4px;
+  --space-2: 8px;
+  --space-3: 12px;
+  --space-4: 16px;
+  --space-5: 20px;
+  --space-6: 24px;
+  --space-8: 32px;
+  --space-12: 48px;
+  --section-y-desktop: 100px;
+  --section-y-tablet: 64px;
+  --section-y-phone: 40px;
+  --radius-sm: 8px;
+  --radius-md: 12px;
+  --radius-lg: 18px;
+  --radius-pill: 980px;
+  --elev-flat: none;
+  --elev-ring: 0 0 0 1px var(--border);
+  --elev-raised: 0 12px 32px rgba(0, 0, 0, 0.08);
+  --focus-ring: 0 0 0 4px color-mix(in oklab, var(--accent), transparent 65%);
+  --motion-fast: 150ms;
+  --motion-base: 220ms;
+  --ease-standard: cubic-bezier(0.28, 0, 0.22, 1);
+  --container-max: 1024px;
+  --container-gutter-desktop: 22px;
+  --container-gutter-tablet: 18px;
+  --container-gutter-phone: 16px;
+}
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+    html, body {
+      width: 100%;
+      min-height: 100%;
+      background: var(--bg);
+      color: var(--fg);
+      font: var(--text-base)/var(--leading-body) var(--font-body);
+      -webkit-font-smoothing: antialiased;
+    }
+    .app {
+      max-width: 390px;
+      min-height: 844px;
+      margin: 0 auto;
+      padding: env(safe-area-inset-top, 12px) var(--space-4) env(safe-area-inset-bottom, 24px);
+      display: flex;
+      flex-direction: column;
+      gap: var(--space-5);
+    }
+    .status {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      font: 600 var(--text-sm)/1 var(--font-body);
+      color: var(--fg);
+      padding-top: var(--space-2);
+    }
+    .status-time { font-variant-numeric: tabular-nums; }
+    .header h1 {
+      font: 600 clamp(28px, 7vw, 34px)/var(--leading-tight) var(--font-display);
+      letter-spacing: var(--tracking-display);
+    }
+    .header p { color: var(--muted); margin-top: var(--space-1); font-size: var(--text-sm); }
+    .watch-pill {
+      display: inline-flex;
+      align-items: center;
+      gap: var(--space-2);
+      padding: var(--space-2) var(--space-3);
+      background: var(--surface);
+      border-radius: var(--radius-pill);
+      font-size: var(--text-sm);
+      color: var(--fg-2);
+      box-shadow: var(--elev-ring);
+    }
+    .watch-pill .dot {
+      width: 8px; height: 8px;
+      border-radius: 50%;
+      background: var(--success);
+    }
+    .hero-card {
+      background: var(--fg);
+      color: #fff;
+      border-radius: var(--radius-lg);
+      padding: var(--space-5);
+      display: flex;
+      flex-direction: column;
+      gap: var(--space-4);
+      box-shadow: var(--elev-raised);
+    }
+    .hero-card .eyebrow {
+      font: 600 var(--text-xs)/1 var(--font-body);
+      letter-spacing: 0.08em;
+      text-transform: uppercase;
+      color: rgba(255,255,255,0.65);
+    }
+    .hero-card h2 {
+      font: 600 var(--text-xl)/1.15 var(--font-display);
+      letter-spacing: var(--tracking-display);
+    }
+    .hero-meta {
+      display: flex;
+      gap: var(--space-5);
+      font-size: var(--text-sm);
+      color: rgba(255,255,255,0.75);
+    }
+    .hero-meta strong {
+      display: block;
+      font: 600 var(--text-lg)/1.2 var(--font-display);
+      color: #fff;
+      font-variant-numeric: tabular-nums;
+    }
+    .btn-pill {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      min-height: 44px;
+      padding: 0 var(--space-5);
+      border: 0;
+      border-radius: var(--radius-pill);
+      background: var(--accent);
+      color: var(--accent-on);
+      font: 600 var(--text-base)/1 var(--font-body);
+      cursor: pointer;
+      transition: background var(--motion-fast) var(--ease-standard);
+    }
+    .btn-pill:hover { background: var(--accent-hover); }
+    .btn-pill:active { background: var(--accent-active); }
+    .btn-pill:focus-visible { outline: none; box-shadow: var(--focus-ring); }
+    .btn-pill.secondary {
+      background: rgba(255,255,255,0.14);
+      color: #fff;
+    }
+    .hero-actions { display: flex; gap: var(--space-3); flex-wrap: wrap; }
+    .section-title {
+      font: 600 var(--text-sm)/1 var(--font-body);
+      color: var(--muted);
+      text-transform: uppercase;
+      letter-spacing: 0.06em;
+    }
+    .route-list { display: flex; flex-direction: column; gap: var(--space-3); }
+    .route-item {
+      display: flex;
+      align-items: center;
+      gap: var(--space-4);
+      padding: var(--space-4);
+      background: var(--surface);
+      border-radius: var(--radius-lg);
+      border: 1px solid var(--border-soft);
+      cursor: pointer;
+      transition: box-shadow var(--motion-fast) var(--ease-standard);
+    }
+    .route-item:hover { box-shadow: var(--elev-raised); }
+    .route-thumb {
+      width: 56px; height: 56px;
+      border-radius: var(--radius-md);
+      background: linear-gradient(145deg, #3d5a45 0%, #1a2e22 100%);
+      flex-shrink: 0;
+    }
+    .route-item h3 { font: 600 var(--text-base)/1.3 var(--font-body); }
+    .route-item p { font-size: var(--text-sm); color: var(--muted); margin-top: 2px; }
+    .route-item .chev { margin-left: auto; color: var(--meta); font-size: 18px; }
+    .quick-grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: var(--space-3);
+    }
+    .quick-tile {
+      min-height: 88px;
+      padding: var(--space-4);
+      background: var(--bg);
+      border: 1px solid var(--border);
+      border-radius: var(--radius-lg);
+      display: flex;
+      flex-direction: column;
+      justify-content: space-between;
+      cursor: pointer;
+      transition: border-color var(--motion-fast) var(--ease-standard);
+    }
+    .quick-tile:hover { border-color: var(--accent); }
+    .quick-tile span { font-size: var(--text-sm); color: var(--muted); }
+    .quick-tile strong { font: 600 var(--text-base)/1.2 var(--font-body); }
+    .tabbar {
+      margin-top: auto;
+      display: flex;
+      justify-content: space-around;
+      padding: var(--space-3) 0 var(--space-2);
+      border-top: 1px solid var(--border-soft);
+    }
+    .tabbar button {
+      background: none;
+      border: 0;
+      font: 600 var(--text-xs)/1 var(--font-body);
+      color: var(--muted);
+      min-width: 44px;
+      min-height: 44px;
+      cursor: pointer;
+    }
+    .tabbar button.active { color: var(--accent); }
+  </style>
+</head>
+<body>
+  <div class="app" data-screen="home">
+    <div class="status" aria-hidden="true">
+      <span class="status-time">9:41</span>
+      <span class="watch-pill"><span class="dot" aria-hidden="true"></span>Apple Watch 已同步</span>
+    </div>
+    <header class="header">
+      <h1>野径</h1>
+      <p>你的徒步路线与补给档案</p>
+    </header>
+
+    <article class="hero-card" aria-labelledby="active-hike">
+      <span class="eyebrow">进行中</span>
+      <h2 id="active-hike">雾凇岭环线 · 第 2 段</h2>
+      <div class="hero-meta">
+        <div><strong>4.2</strong>公里</div>
+        <div><strong>287</strong>米爬升</div>
+        <div><strong>118</strong>心率</div>
+      </div>
+      <div class="hero-actions">
+        <button type="button" class="btn-pill" id="resume-btn">继续记录</button>
+        <button type="button" class="btn-pill secondary" id="mark-btn">添加标记</button>
+      </div>
+    </article>
+
+    <section aria-labelledby="recent-label">
+      <h2 class="section-title" id="recent-label">最近路线</h2>
+      <div class="route-list">
+        <div class="route-item" tabindex="0" role="button">
+          <div class="route-thumb" aria-hidden="true"></div>
+          <div>
+            <h3>西湖群山 · 九溪至龙井</h3>
+            <p>12.8 km · 6 个补给点 · 昨天</p>
+          </div>
+          <span class="chev" aria-hidden="true">›</span>
+        </div>
+        <div class="route-item" tabindex="0" role="button">
+          <div class="route-thumb" aria-hidden="true" style="background:linear-gradient(145deg,#5c4a3a,#2a2218)"></div>
+          <div>
+            <h3>莫干山古道 · 单日</h3>
+            <p>18.1 km · 9 个风景点 · 3 月 28 日</p>
+          </div>
+          <span class="chev" aria-hidden="true">›</span>
+        </div>
+      </div>
+    </section>
+
+    <section aria-labelledby="quick-label">
+      <h2 class="section-title" id="quick-label">快捷入口</h2>
+      <div class="quick-grid">
+        <button type="button" class="quick-tile" data-nav="markers">
+          <span>补给 · 风景</span>
+          <strong>标记管理</strong>
+        </button>
+        <button type="button" class="quick-tile" data-nav="transit">
+          <span>起终点</span>
+          <strong>如何到达</strong>
+        </button>
+        <button type="button" class="quick-tile" data-nav="watch">
+          <span>健康数据</span>
+          <strong>Watch 面板</strong>
+        </button>
+        <button type="button" class="quick-tile" data-nav="new">
+          <span>新路线</span>
+          <strong>规划徒步</strong>
+        </button>
+      </div>
+    </section>
+
+    <nav class="tabbar" aria-label="主导航">
+      <button type="button" class="active" aria-current="page">首页</button>
+      <button type="button">路线</button>
+      <button type="button">标记</button>
+      <button type="button">我的</button>
+    </nav>
+  </div>
+  <script>
+    document.getElementById('resume-btn').addEventListener('click', function () {
+      this.textContent = '正在恢复 GPS…';
+      var self = this;
+      setTimeout(function () { self.textContent = '继续记录'; }, 1200);
+    });
+    document.getElementById('mark-btn').addEventListener('click', function () {
+      this.textContent = '打开标记…';
+      var self = this;
+      setTimeout(function () { self.textContent = '添加标记'; }, 800);
+    });
+    document.querySelectorAll('.quick-tile').forEach(function (el) {
+      el.addEventListener('click', function () {
+        document.querySelectorAll('.quick-tile').forEach(function (t) {
+          t.style.borderColor = '';
+        });
+        el.style.borderColor = 'var(--accent)';
+      });
+    });
+  </script>
+</body>
+</html>

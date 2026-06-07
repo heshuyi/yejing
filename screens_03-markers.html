@@ -1,0 +1,413 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
+  <title>野径 · 标记</title>
+  <style>
+:root {
+  --bg: #ffffff;
+  --surface: #f5f5f7;
+  --fg: #1d1d1f;
+  --fg-2: #424245;
+  --muted: #6e6e73;
+  --meta: #86868b;
+  --border: #d2d2d7;
+  --border-soft: #e8e8ed;
+  --accent: #0071e3;
+  --accent-on: #ffffff;
+  --accent-hover: #0077ed;
+  --accent-active: #0066cc;
+  --success: #16a34a;
+  --warn: #eab308;
+  --font-display: "SF Pro Display", "Helvetica Neue", Helvetica, Arial, sans-serif;
+  --font-body: "SF Pro Text", "Helvetica Neue", Helvetica, Arial, sans-serif;
+  --font-mono: "SF Mono", ui-monospace, Menlo, monospace;
+  --text-xs: 12px;
+  --text-sm: 14px;
+  --text-base: 17px;
+  --text-lg: 21px;
+  --radius-sm: 8px;
+  --radius-md: 12px;
+  --radius-lg: 18px;
+  --radius-pill: 980px;
+  --elev-raised: 0 12px 32px rgba(0, 0, 0, 0.08);
+  --focus-ring: 0 0 0 4px color-mix(in oklab, var(--accent), transparent 65%);
+  --motion-fast: 150ms;
+  --ease-standard: cubic-bezier(0.28, 0, 0.22, 1);
+  --space-2: 8px;
+  --space-3: 12px;
+  --space-4: 16px;
+  --space-5: 20px;
+}
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+    body {
+      font: var(--text-base)/1.47 var(--font-body);
+      background: var(--bg);
+      color: var(--fg);
+      -webkit-font-smoothing: antialiased;
+    }
+    .app {
+      max-width: 390px;
+      min-height: 844px;
+      margin: 0 auto;
+      padding: env(safe-area-inset-top, 12px) var(--space-4) env(safe-area-inset-bottom, 24px);
+      display: flex;
+      flex-direction: column;
+      gap: var(--space-4);
+    }
+    .nav-row {
+      display: flex;
+      align-items: center;
+      gap: var(--space-3);
+      padding-top: var(--space-2);
+    }
+    .back {
+      min-width: 44px; min-height: 44px;
+      border: 0; background: none;
+      font-size: 22px;
+      color: var(--accent);
+      cursor: pointer;
+    }
+    h1 { font: 600 var(--text-lg)/1.2 var(--font-display); letter-spacing: -0.015em; flex: 1; }
+    .seg {
+      display: flex;
+      background: var(--surface);
+      border-radius: var(--radius-pill);
+      padding: 3px;
+    }
+    .seg button {
+      flex: 1;
+      min-height: 36px;
+      border: 0;
+      border-radius: var(--radius-pill);
+      background: transparent;
+      font: 600 var(--text-sm)/1 var(--font-body);
+      color: var(--muted);
+      cursor: pointer;
+      transition: background var(--motion-fast) var(--ease-standard), color var(--motion-fast) var(--ease-standard);
+    }
+    .seg button.active {
+      background: var(--bg);
+      color: var(--fg);
+      box-shadow: 0 1px 4px rgba(0,0,0,0.08);
+    }
+    .filter-chips {
+      display: flex;
+      gap: var(--space-2);
+      flex-wrap: wrap;
+    }
+    .chip {
+      padding: var(--space-2) var(--space-3);
+      border-radius: var(--radius-pill);
+      border: 1px solid var(--border);
+      background: var(--bg);
+      font-size: var(--text-sm);
+      color: var(--fg-2);
+      cursor: pointer;
+      min-height: 36px;
+    }
+    .chip.on {
+      border-color: var(--accent);
+      color: var(--accent);
+      background: color-mix(in oklab, var(--accent), transparent 94%);
+    }
+    .list { display: flex; flex-direction: column; gap: var(--space-3); flex: 1; }
+    .marker-card {
+      display: grid;
+      grid-template-columns: 72px 1fr auto;
+      gap: var(--space-3);
+      align-items: center;
+      padding: var(--space-3);
+      border: 1px solid var(--border-soft);
+      border-radius: var(--radius-lg);
+      background: var(--bg);
+    }
+    .marker-card.hidden { display: none; }
+    .thumb {
+      width: 72px; height: 72px;
+      border-radius: var(--radius-md);
+      background: var(--surface);
+      object-fit: cover;
+    }
+    .thumb.supply { background: linear-gradient(135deg, #e8eef5, #b8c9dc); }
+    .thumb.scenic { background: linear-gradient(135deg, #d4e8d4, #7aa87a); }
+    .marker-card h3 { font: 600 var(--text-base)/1.3 var(--font-body); }
+    .marker-card p { font-size: var(--text-sm); color: var(--muted); margin-top: 2px; }
+    .badge {
+      font: 600 var(--text-xs)/1 var(--font-body);
+      padding: 4px 8px;
+      border-radius: var(--radius-pill);
+      background: var(--surface);
+      color: var(--fg-2);
+    }
+    .badge.supply { color: var(--accent); background: color-mix(in oklab, var(--accent), transparent 92%); }
+    .badge.scenic { color: var(--success); background: color-mix(in oklab, var(--success), transparent 90%); }
+    .fab {
+      position: sticky;
+      bottom: var(--space-4);
+      width: 100%;
+      min-height: 50px;
+      border: 0;
+      border-radius: var(--radius-pill);
+      background: var(--accent);
+      color: var(--accent-on);
+      font: 600 var(--text-base)/1 var(--font-body);
+      cursor: pointer;
+      box-shadow: var(--elev-raised);
+    }
+    .fab:hover { background: var(--accent-hover); }
+    .sheet {
+      position: fixed;
+      inset: 0;
+      background: rgba(0,0,0,0.4);
+      display: none;
+      align-items: flex-end;
+      justify-content: center;
+      z-index: 10;
+    }
+    .sheet.open { display: flex; }
+    .sheet-panel {
+      width: 100%;
+      max-width: 390px;
+      background: var(--bg);
+      border-radius: var(--radius-lg) var(--radius-lg) 0 0;
+      padding: var(--space-5) var(--space-4);
+    }
+    .sheet-panel h2 { font: 600 var(--text-lg)/1.2 var(--font-display); margin-bottom: var(--space-4); }
+    .type-row { display: flex; gap: var(--space-3); margin-bottom: var(--space-4); }
+    .type-btn {
+      flex: 1;
+      min-height: 80px;
+      border: 1px solid var(--border);
+      border-radius: var(--radius-lg);
+      background: var(--surface);
+      font: 600 var(--text-base)/1.2 var(--font-body);
+      cursor: pointer;
+    }
+    .type-btn.selected { border-color: var(--accent); background: color-mix(in oklab, var(--accent), transparent 94%); }
+    .field { margin-bottom: var(--space-4); }
+    .field label { display: block; font-size: var(--text-sm); color: var(--muted); margin-bottom: var(--space-2); }
+    .field input, .field textarea {
+      width: 100%;
+      padding: var(--space-3);
+      border: 1px solid var(--border);
+      border-radius: var(--radius-sm);
+      font: var(--text-base)/1.47 var(--font-body);
+    }
+    .field input:focus-visible, .field textarea:focus-visible {
+      outline: none;
+      box-shadow: var(--focus-ring);
+      border-color: var(--accent);
+    }
+    .sheet-actions { display: flex; gap: var(--space-3); }
+    .sheet-actions button {
+      flex: 1;
+      min-height: 44px;
+      border-radius: var(--radius-pill);
+      font: 600 var(--text-base)/1 var(--font-body);
+      cursor: pointer;
+    }
+    .cancel { border: 1px solid var(--border); background: var(--bg); color: var(--fg); }
+    .save { border: 0; background: var(--accent); color: var(--accent-on); }
+    .view-toggle { margin-bottom: 0; }
+    .map-view {
+      flex: 1; min-height: 360px; border-radius: var(--radius-lg); position: relative; overflow: hidden;
+      background: linear-gradient(160deg, #c8d4c4, #5a7356); display: none;
+    }
+    .map-view.active { display: block; }
+    .map-view svg { position: absolute; inset: 0; width: 100%; height: 100%; }
+    .map-pin {
+      position: absolute; width: 14px; height: 14px; border-radius: 50%;
+      border: 2px solid #fff; box-shadow: 0 2px 6px rgba(0,0,0,0.3);
+    }
+    .map-pin.supply { background: var(--accent); }
+    .map-pin.photo { background: var(--success); }
+    .list.hidden { display: none; }
+    .photo-fields { display: none; }
+    .photo-fields.show { display: block; }
+    .field select {
+      width: 100%; padding: var(--space-3); border: 1px solid var(--border);
+      border-radius: var(--radius-sm); font: var(--text-base)/1.47 var(--font-body);
+    }
+  </style>
+</head>
+<body>
+  <div class="app">
+    <div class="nav-row">
+      <button type="button" class="back" aria-label="返回">‹</button>
+      <h1>路线标记</h1>
+    </div>
+    <div class="seg view-toggle" role="tablist" aria-label="视图切换">
+      <button type="button" class="active" data-view="list" role="tab" aria-selected="true">列表</button>
+      <button type="button" data-view="map" role="tab" aria-selected="false">地图</button>
+    </div>
+    <div class="seg" role="tablist" aria-label="标记类型">
+      <button type="button" class="active" data-filter="all" role="tab" aria-selected="true">全部</button>
+      <button type="button" data-filter="supply" role="tab" aria-selected="false">补给点</button>
+      <button type="button" data-filter="photo" role="tab" aria-selected="false">美照</button>
+    </div>
+    <div class="filter-chips">
+      <button type="button" class="chip on" data-route="current">雾凇岭环线</button>
+      <button type="button" class="chip" data-route="west">西湖群山</button>
+    </div>
+    <div class="map-view" id="map-view" role="img" aria-label="标记地图视图">
+      <svg viewBox="0 0 360 360" preserveAspectRatio="none" aria-hidden="true">
+        <path d="M30 320 Q120 240 180 200 T330 60" fill="none" stroke="#0071e3" stroke-width="3"/>
+      </svg>
+      <span class="map-pin supply" style="left:22%;top:58%"></span>
+      <span class="map-pin photo" style="left:42%;top:42%"></span>
+      <span class="map-pin supply" style="left:55%;top:35%"></span>
+      <span class="map-pin photo" style="left:68%;top:28%"></span>
+    </div>
+    <div class="list" id="marker-list">
+      <article class="marker-card" data-type="supply">
+        <div class="thumb supply" role="img" aria-label="山泉补给点照片占位"></div>
+        <div>
+          <h3>山泉水站 · 2.1 km</h3>
+          <p>可饮用 · 上次补给 3 月 2 日</p>
+        </div>
+        <span class="badge supply">补给</span>
+      </article>
+      <article class="marker-card" data-type="photo">
+        <div class="thumb scenic" role="img" aria-label="观景台照片占位"></div>
+        <div>
+          <h3>观景台 · 3.8 km</h3>
+          <p>东南向 · 日出 · 上次拍摄 3月28日</p>
+        </div>
+        <span class="badge scenic">美照</span>
+      </article>
+      <article class="marker-card" data-type="supply">
+        <div class="thumb supply"></div>
+        <div>
+          <h3>驿站小卖部 · 5.4 km</h3>
+          <p>热水、能量胶 · 营业至 17:00</p>
+        </div>
+        <span class="badge supply">补给</span>
+      </article>
+      <article class="marker-card" data-type="photo">
+        <div class="thumb scenic"></div>
+        <div>
+          <h3>冷杉林道口 · 6.2 km</h3>
+          <p>你标记的拍照点 · 2025-03-28</p>
+        </div>
+        <span class="badge scenic">美照</span>
+      </article>
+    </div>
+    <button type="button" class="fab" id="open-sheet">添加标记</button>
+  </div>
+
+  <div class="sheet" id="sheet" role="dialog" aria-modal="true" aria-labelledby="sheet-title" hidden>
+    <div class="sheet-panel">
+      <h2 id="sheet-title">新标记</h2>
+      <div class="type-row">
+        <button type="button" class="type-btn selected" data-type="supply">补给点</button>
+        <button type="button" class="type-btn" data-type="photo">美照位置</button>
+      </div>
+      <div class="field">
+        <label for="marker-name">名称</label>
+        <input id="marker-name" type="text" placeholder="例如：山泉、观景台" />
+      </div>
+      <div class="photo-fields" id="photo-fields">
+        <div class="field">
+          <label for="facing">拍摄朝向</label>
+          <select id="facing">
+            <option>东</option><option>东南</option><option>南</option><option>西南</option>
+            <option>西</option><option>西北</option><option>北</option><option>东北</option>
+          </select>
+        </div>
+        <div class="field">
+          <label for="best-time">推荐时段</label>
+          <select id="best-time">
+            <option>日出</option><option>上午</option><option>下午</option><option>日落</option><option>四季皆宜</option>
+          </select>
+        </div>
+      </div>
+      <div class="field">
+        <label for="marker-note">备注</label>
+        <textarea id="marker-note" rows="2" placeholder="水质、焦段建议、营业时间…"></textarea>
+      </div>
+      <div class="sheet-actions">
+        <button type="button" class="cancel" id="close-sheet">取消</button>
+        <button type="button" class="save" id="save-marker">保存到当前路线</button>
+      </div>
+    </div>
+  </div>
+
+  <script>
+    (function () {
+      var sheet = document.getElementById('sheet');
+      var list = document.getElementById('marker-list');
+      function setFilter(type) {
+        list.querySelectorAll('.marker-card').forEach(function (card) {
+          card.classList.toggle('hidden', type !== 'all' && card.dataset.type !== type);
+        });
+      }
+      document.querySelectorAll('.seg button').forEach(function (btn) {
+        btn.addEventListener('click', function () {
+          document.querySelectorAll('.seg button').forEach(function (b) {
+            b.classList.remove('active');
+            b.setAttribute('aria-selected', 'false');
+          });
+          btn.classList.add('active');
+          btn.setAttribute('aria-selected', 'true');
+          setFilter(btn.dataset.filter);
+        });
+      });
+      document.querySelectorAll('.chip').forEach(function (chip) {
+        chip.addEventListener('click', function () {
+          document.querySelectorAll('.chip').forEach(function (c) { c.classList.remove('on'); });
+          chip.classList.add('on');
+        });
+      });
+      document.getElementById('open-sheet').addEventListener('click', function () {
+        sheet.hidden = false;
+        sheet.classList.add('open');
+      });
+      function closeSheet() {
+        sheet.classList.remove('open');
+        sheet.hidden = true;
+      }
+      document.getElementById('close-sheet').addEventListener('click', closeSheet);
+      sheet.addEventListener('click', function (e) {
+        if (e.target === sheet) closeSheet();
+      });
+      document.querySelectorAll('[data-view]').forEach(function (btn) {
+        btn.addEventListener('click', function () {
+          document.querySelectorAll('[data-view]').forEach(function (b) {
+            b.classList.remove('active');
+            b.setAttribute('aria-selected', 'false');
+          });
+          btn.classList.add('active');
+          btn.setAttribute('aria-selected', 'true');
+          var isMap = btn.dataset.view === 'map';
+          document.getElementById('map-view').classList.toggle('active', isMap);
+          list.classList.toggle('hidden', isMap);
+        });
+      });
+      document.querySelectorAll('.type-btn').forEach(function (btn) {
+        btn.addEventListener('click', function () {
+          document.querySelectorAll('.type-btn').forEach(function (b) { b.classList.remove('selected'); });
+          btn.classList.add('selected');
+          document.getElementById('photo-fields').classList.toggle('show', btn.dataset.type === 'photo');
+        });
+      });
+      document.getElementById('save-marker').addEventListener('click', function () {
+        var name = document.getElementById('marker-name').value.trim() || '未命名标记';
+        var type = document.querySelector('.type-btn.selected').dataset.type;
+        var thumbClass = type === 'supply' ? 'supply' : 'scenic';
+        var card = document.createElement('article');
+        card.className = 'marker-card';
+        card.dataset.type = type;
+        card.innerHTML =
+          '<div class="thumb ' + thumbClass + '"></div><div><h3>' + name + '</h3><p>刚刚添加 · 当前 GPS</p></div>' +
+          '<span class="badge ' + thumbClass + '">' + (type === 'supply' ? '补给' : '美照') + '</span>';
+        list.prepend(card);
+        document.getElementById('marker-name').value = '';
+        document.getElementById('marker-note').value = '';
+        closeSheet();
+      });
+    })();
+  </script>
+</body>
+</html>
