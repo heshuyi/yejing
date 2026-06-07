@@ -30,13 +30,19 @@
 | 5 | Expo + Node 骨架设计 | ✅ 已合并 |
 | 6 | Expo + Node 骨架实现 | ✅ 已合并 |
 
-## 进行中的功能
+## 已合并的功能 PR
 
-| 顺序 | slug | 说明 |
-|------|------|------|
-| 7 | `pr-workflow` | 本指南 + Skill 中文 PR 规范 |
-| 8–9 | `user-auth` | 用户认证（设计 → 实现） |
-| 后续 | `routes-crud` 等 | 见 `.cursor/skills/yejing-pr-driven-dev/reference.md` |
+| 顺序 | slug | 说明 | 状态 |
+|------|------|------|------|
+| 7 | `pr-workflow` | 本指南 + Skill 中文 PR 规范 | ✅ |
+| 8–9 | `user-auth` | 用户认证（设计 → 实现） | ✅ |
+
+## 下一步
+
+| slug | 说明 |
+|------|------|
+| `routes-crud` | 路线 CRUD（设计 → 实现） |
+| 更多 | 见 `.cursor/skills/yejing-pr-driven-dev/reference.md` |
 
 ## 你怎么参与（可选）
 
