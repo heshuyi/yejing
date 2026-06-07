@@ -1,13 +1,18 @@
-import { StyleSheet } from "react-native";
+import { Pressable, StyleSheet } from "react-native";
 import { Text, View } from "@/components/Themed";
-import { API_URL } from "@/constants/api";
+import { useAuth } from "@/contexts/AuthContext";
 
 export default function ProfileScreen() {
+  const { user, logout } = useAuth();
+
   return (
     <View style={styles.container}>
       <Text style={styles.title}>我的</Text>
-      <Text style={styles.subtitle}>设置与数据管理</Text>
-      <Text style={styles.meta}>API: {API_URL}</Text>
+      <Text style={styles.subtitle}>{user?.displayName ?? "徒步者"}</Text>
+      <Text style={styles.meta}>{user?.email}</Text>
+      <Pressable style={styles.logout} onPress={() => logout()}>
+        <Text style={styles.logoutText}>退出登录</Text>
+      </Pressable>
     </View>
   );
 }
@@ -29,8 +34,20 @@ const styles = StyleSheet.create({
     opacity: 0.6,
   },
   meta: {
-    marginTop: 24,
-    fontSize: 12,
-    opacity: 0.4,
+    marginTop: 8,
+    fontSize: 14,
+    opacity: 0.5,
+  },
+  logout: {
+    marginTop: 32,
+    paddingVertical: 12,
+    paddingHorizontal: 24,
+    borderRadius: 12,
+    backgroundColor: "#f5f5f7",
+  },
+  logoutText: {
+    fontSize: 15,
+    color: "#0071e3",
+    fontWeight: "600",
   },
 });
