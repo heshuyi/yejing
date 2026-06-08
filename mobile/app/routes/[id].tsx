@@ -95,11 +95,30 @@ export default function RouteDetailScreen() {
           </Text>
 
           {route.status === "draft" ? (
+            <>
+              <Pressable
+                style={styles.primaryButton}
+                onPress={() => router.push(`/recording/${route.id}`)}
+              >
+                <Text style={styles.primaryButtonText}>开始记录</Text>
+              </Pressable>
+              <Pressable
+                style={styles.editButton}
+                onPress={() => router.push(`/routes/plan?id=${route.id}`)}
+              >
+                <Text style={styles.editText}>编辑规划</Text>
+              </Pressable>
+            </>
+          ) : null}
+
+          {route.status === "active" ? (
             <Pressable
-              style={styles.editButton}
-              onPress={() => router.push(`/routes/plan?id=${route.id}`)}
+              style={styles.primaryButton}
+              onPress={() => router.push(`/recording/${route.id}`)}
             >
-              <Text style={styles.editText}>编辑规划</Text>
+              <Text style={styles.primaryButtonText}>
+                {route.recordingState === "paused" ? "继续记录" : "进入记录页"}
+              </Text>
             </Pressable>
           ) : null}
 
@@ -136,6 +155,13 @@ const styles = StyleSheet.create({
   label: { fontSize: 13, color: "#6e6e73", marginBottom: 4 },
   value: { fontSize: 17, color: "#1d1d1f" },
   hint: { fontSize: 14, color: "#6e6e73", lineHeight: 20 },
+  primaryButton: {
+    paddingVertical: 14,
+    alignItems: "center",
+    borderRadius: 12,
+    backgroundColor: "#0071e3",
+  },
+  primaryButtonText: { color: "#fff", fontSize: 15, fontWeight: "600" },
   editButton: {
     paddingVertical: 14,
     alignItems: "center",

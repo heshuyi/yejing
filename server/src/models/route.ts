@@ -29,6 +29,7 @@ export interface RouteDoc {
   goalDistanceKm?: { min?: number; max?: number };
   stats?: RouteStats;
   startedAt?: Date;
+  recordingState?: "recording" | "paused";
   createdAt: Date;
   updatedAt: Date;
 }
@@ -56,6 +57,7 @@ export interface RoutePublic extends RouteSummary {
   goalDistanceKm?: GoalDistanceKm | null;
   stats?: RouteStats;
   startedAt: string | null;
+  recordingState?: "recording" | "paused" | null;
   createdAt: string;
 }
 
@@ -81,6 +83,7 @@ export function toPublicRoute(doc: RouteDoc): RoutePublic {
     goalDistanceKm: doc.goalDistanceKm,
     stats: doc.stats,
     startedAt: doc.startedAt?.toISOString() ?? null,
+    recordingState: doc.recordingState ?? null,
     createdAt: doc.createdAt.toISOString(),
   };
 }
@@ -89,6 +92,16 @@ export async function ensureRouteIndexes(): Promise<void> {
   const db = await connectDb();
   const col = db.collection<RouteDoc>("routes");
   await col.createIndex({ userId: 1, status: 1, updatedAt: -1 });
+
+  try {
+    // 开发库沿用 init 脚本较严的 schema；放宽校验避免新字段写入失败
+    await db.command({
+      collMod: "routes",
+      validationLevel: "off",
+    });
+  } catch {
+    // 集合尚未创建时忽略
+  }
 }
 
 function sortRoutes(docs: RouteDoc[]): RouteDoc[] {

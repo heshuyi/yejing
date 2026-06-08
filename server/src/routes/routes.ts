@@ -1,5 +1,6 @@
 import { Router } from "express";
 import { requireAuth, type AuthedRequest } from "../middleware/auth.js";
+import { registerRecordingRoutes } from "./recording.js";
 import {
   createRoute,
   deleteRoute,
@@ -55,6 +56,8 @@ routesRouter.get("/", async (req: AuthedRequest, res) => {
   const routes = await listRoutesForUser(req.user!._id, { status, q });
   res.json({ routes });
 });
+
+registerRecordingRoutes(routesRouter);
 
 routesRouter.get("/:id", async (req: AuthedRequest, res) => {
   const route = await findRouteForUser(req.user!._id, routeIdParam(req.params.id));
