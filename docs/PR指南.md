@@ -38,12 +38,12 @@
 | 8–9 | `user-auth` | 用户认证（设计 → 实现） | ✅ |
 | 11–12 | `routes-crud` | 路线库 CRUD（设计 → 实现） | ✅ |
 | 14–15 | `plan-route` | 规划新路线（设计 → 实现） | ✅ |
+| 17–18 | `gps-recording` | GPS 轨迹记录（设计 → 实现） | ✅ |
 
 ## 下一步
 
 | slug | 说明 |
 |------|------|
-| `gps-recording` | GPS 轨迹记录 |
 | `markers` | 补给 / 美照标记 |
 | 更多 | 见 `.cursor/skills/yejing-pr-driven-dev/reference.md` |
 
