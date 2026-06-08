@@ -40,13 +40,13 @@
 | 14–15 | `plan-route` | 规划新路线（设计 → 实现） | ✅ |
 | 17–18 | `gps-recording` | GPS 轨迹记录（设计 → 实现） | ✅ |
 | 20–21 | `markers` | 补给 / 美照标记（设计 → 实现） | ✅ |
+| 23–24 | `route-detail` | 路线详情聚合（设计 → 实现） | ✅ |
 
 ## 下一步
 
 | slug | 说明 |
 |------|------|
-| `route-detail` | 路线详情（轨迹 + 标记聚合） |
-| `transit` | 如何到达 |
+| `transit` | 如何到达（起终点导航） |
 | 更多 | 见 `.cursor/skills/yejing-pr-driven-dev/reference.md` |
 
 ## 你怎么参与（可选）
