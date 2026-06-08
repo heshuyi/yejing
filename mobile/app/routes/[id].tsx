@@ -143,7 +143,7 @@ export default function RouteDetailScreen() {
           <View style={styles.actionRow}>
             <Pressable
               style={styles.secondaryBtn}
-              onPress={() => Alert.alert("即将开放", "如何到达功能将在 transit PR 中实现")}
+              onPress={() => router.push(`/routes/${route.id}/transit`)}
             >
               <Text style={styles.secondaryBtnText}>如何到达</Text>
             </Pressable>
