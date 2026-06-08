@@ -51,11 +51,34 @@ export interface RouteSummary {
   updatedAt: string;
 }
 
+export interface GeoPoint {
+  type: "Point";
+  coordinates: [number, number];
+}
+
+export interface GoalDistanceKm {
+  min?: number;
+  max?: number;
+}
+
+export interface RoutePlanInput {
+  name: string;
+  isLoop?: boolean;
+  startPlace?: string;
+  endPlace?: string;
+  startCoordinate?: GeoPoint;
+  endCoordinate?: GeoPoint;
+  goalDistanceKm?: GoalDistanceKm | null;
+}
+
 export interface RouteDetail extends RouteSummary {
   isLoop: boolean;
   endPlace: string | null;
   createdAt: string;
   startedAt: string | null;
+  startCoordinate?: GeoPoint;
+  endCoordinate?: GeoPoint;
+  goalDistanceKm?: GoalDistanceKm | null;
   stats?: {
     distanceKm?: number;
     markerCount?: number;
@@ -88,11 +111,23 @@ export function fetchRoute(
 
 export function createRoute(
   token: string,
-  input: { name: string },
+  input: RoutePlanInput,
 ): Promise<{ route: RouteDetail }> {
   return request<{ route: RouteDetail }>(
     "/api/routes",
     { method: "POST", body: JSON.stringify(input) },
+    token,
+  );
+}
+
+export function updateRoute(
+  token: string,
+  id: string,
+  input: Partial<RoutePlanInput>,
+): Promise<{ route: RouteDetail }> {
+  return request<{ route: RouteDetail }>(
+    `/api/routes/${id}`,
+    { method: "PATCH", body: JSON.stringify(input) },
     token,
   );
 }
