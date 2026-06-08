@@ -110,6 +110,28 @@ export function fetchRoute(
   return request<{ route: RouteDetail }>(`/api/routes/${id}`, {}, token);
 }
 
+export interface RouteDetailAggregate {
+  route: RouteDetail;
+  track: {
+    pointCount: number;
+    coordinates: [number, number][];
+  };
+  markers: Marker[];
+  summary: {
+    distanceKm: number;
+    elevationGainM: number;
+    durationSec: number;
+    markerCount: number;
+  };
+}
+
+export function fetchRouteDetail(
+  token: string,
+  id: string,
+): Promise<RouteDetailAggregate> {
+  return request<RouteDetailAggregate>(`/api/routes/${id}/detail`, {}, token);
+}
+
 export function createRoute(
   token: string,
   input: RoutePlanInput,

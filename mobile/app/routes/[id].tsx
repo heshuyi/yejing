@@ -10,8 +10,16 @@ import {
   View,
 } from "react-native";
 
+import { RouteMapPreview } from "@/components/RouteMapPreview";
+import { MARKER_TYPE_LABEL } from "@/constants/markers";
 import { useAuth } from "@/contexts/AuthContext";
-import { deleteRoute, fetchRoute, type RouteDetail } from "@/lib/api";
+import {
+  deleteRoute,
+  fetchRouteDetail,
+  type Marker,
+  type RouteDetail,
+} from "@/lib/api";
+import { formatDuration } from "@/lib/recordingMetrics";
 
 const STATUS_LABEL = {
   active: "进行中",
@@ -24,12 +32,25 @@ export default function RouteDetailScreen() {
   const { token } = useAuth();
   const router = useRouter();
   const [route, setRoute] = useState<RouteDetail | null>(null);
+  const [markers, setMarkers] = useState<Marker[]>([]);
+  const [coordinates, setCoordinates] = useState<[number, number][]>([]);
+  const [summary, setSummary] = useState({
+    distanceKm: 0,
+    elevationGainM: 0,
+    durationSec: 0,
+    markerCount: 0,
+  });
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
     if (!token || !id) return;
-    fetchRoute(token, id)
-      .then(({ route: data }) => setRoute(data))
+    fetchRouteDetail(token, id)
+      .then((data) => {
+        setRoute(data.route);
+        setMarkers(data.markers);
+        setCoordinates(data.track.coordinates);
+        setSummary(data.summary);
+      })
       .catch(() => setRoute(null))
       .finally(() => setLoading(false));
   }, [token, id]);
@@ -53,131 +74,200 @@ export default function RouteDetailScreen() {
     ]);
   }
 
+  if (loading) {
+    return <ActivityIndicator style={styles.loader} color="#0071e3" />;
+  }
+
+  if (!route) {
+    return (
+      <View style={styles.center}>
+        <Text style={styles.error}>路线不存在或无法加载</Text>
+      </View>
+    );
+  }
+
+  const dateStr = new Date(route.updatedAt).toLocaleDateString("zh-CN");
+
   return (
     <>
-      <Stack.Screen options={{ title: route?.name ?? "路线详情" }} />
-      {loading ? (
-        <ActivityIndicator style={styles.loader} color="#0071e3" />
-      ) : !route ? (
-        <View style={styles.center}>
-          <Text style={styles.error}>路线不存在或无法加载</Text>
-        </View>
-      ) : (
-        <ScrollView contentContainerStyle={styles.content}>
+      <Stack.Screen options={{ title: route.name }} />
+      <ScrollView style={styles.scroll} contentContainerStyle={styles.content}>
+        <RouteMapPreview coordinates={coordinates} markers={markers} />
+
+        <View style={styles.sheet}>
+          <View style={styles.drag} />
           <Text style={styles.title}>{route.name}</Text>
-          <Text style={styles.badge}>{STATUS_LABEL[route.status]}</Text>
+          <Text style={styles.badge}>{STATUS_LABEL[route.status]} · {dateStr}</Text>
 
-          <View style={styles.section}>
-            <Text style={styles.label}>里程</Text>
-            <Text style={styles.value}>
-              {route.distanceKm != null ? `${route.distanceKm} km` : "—"}
-            </Text>
-          </View>
-          <View style={styles.section}>
-            <Text style={styles.label}>标记</Text>
-            <Text style={styles.value}>{route.markerCount}</Text>
-          </View>
-          <View style={styles.section}>
-            <Text style={styles.label}>起点</Text>
-            <Text style={styles.value}>{route.startPlace || "未设置"}</Text>
-          </View>
-          <View style={styles.section}>
-            <Text style={styles.label}>终点</Text>
-            <Text style={styles.value}>{route.endPlace || "未设置"}</Text>
-          </View>
-          <View style={styles.section}>
-            <Text style={styles.label}>环线</Text>
-            <Text style={styles.value}>{route.isLoop ? "是" : "否"}</Text>
+          <View style={styles.statsRow}>
+            <View style={styles.stat}>
+              <Text style={styles.statValue}>{summary.distanceKm}</Text>
+              <Text style={styles.statLabel}>公里</Text>
+            </View>
+            <View style={styles.stat}>
+              <Text style={styles.statValue}>{summary.elevationGainM}</Text>
+              <Text style={styles.statLabel}>爬升 m</Text>
+            </View>
+            <View style={styles.stat}>
+              <Text style={styles.statValue}>
+                {summary.durationSec > 0 ? formatDuration(summary.durationSec) : "—"}
+              </Text>
+              <Text style={styles.statLabel}>时长</Text>
+            </View>
+            <View style={styles.stat}>
+              <Text style={styles.statValue}>{summary.markerCount}</Text>
+              <Text style={styles.statLabel}>标记</Text>
+            </View>
           </View>
 
-          <Pressable
-            style={styles.primaryButton}
-            onPress={() => router.push(`/routes/${route.id}/markers`)}
-          >
-            <Text style={styles.primaryButtonText}>查看标记（{route.markerCount}）</Text>
-          </Pressable>
+          {markers.length > 0 ? (
+            <ScrollView horizontal showsHorizontalScrollIndicator={false} style={styles.markerScroll}>
+              {markers.map((m) => (
+                <Pressable
+                  key={m.id}
+                  style={styles.miniCard}
+                  onPress={() => router.push(`/routes/${route.id}/markers`)}
+                >
+                  <Text style={styles.miniTitle} numberOfLines={1}>
+                    {m.name}
+                  </Text>
+                  <Text style={styles.miniMeta}>
+                    {MARKER_TYPE_LABEL[m.type]}
+                    {m.distanceFromStart != null ? ` · ${m.distanceFromStart} km` : ""}
+                  </Text>
+                </Pressable>
+              ))}
+            </ScrollView>
+          ) : null}
 
-          <Text style={styles.hint}>
-            完整地图与轨迹详情将在后续版本提供。如何到达导航功能即将上线。
-          </Text>
+          <View style={styles.actionRow}>
+            <Pressable
+              style={styles.secondaryBtn}
+              onPress={() => Alert.alert("即将开放", "如何到达功能将在 transit PR 中实现")}
+            >
+              <Text style={styles.secondaryBtnText}>如何到达</Text>
+            </Pressable>
+            <Pressable
+              style={styles.primaryBtn}
+              onPress={() => router.push(`/routes/${route.id}/markers`)}
+            >
+              <Text style={styles.primaryBtnText}>管理标记</Text>
+            </Pressable>
+          </View>
 
           {route.status === "draft" ? (
-            <>
-              <Pressable
-                style={styles.primaryButton}
-                onPress={() => router.push(`/recording/${route.id}`)}
-              >
-                <Text style={styles.primaryButtonText}>开始记录</Text>
-              </Pressable>
-              <Pressable
-                style={styles.editButton}
-                onPress={() => router.push(`/routes/plan?id=${route.id}`)}
-              >
-                <Text style={styles.editText}>编辑规划</Text>
-              </Pressable>
-            </>
+            <Pressable
+              style={styles.fullBtn}
+              onPress={() => router.push(`/recording/${route.id}`)}
+            >
+              <Text style={styles.primaryBtnText}>开始记录</Text>
+            </Pressable>
           ) : null}
 
           {route.status === "active" ? (
             <Pressable
-              style={styles.primaryButton}
+              style={styles.fullBtn}
               onPress={() => router.push(`/recording/${route.id}`)}
             >
-              <Text style={styles.primaryButtonText}>
+              <Text style={styles.primaryBtnText}>
                 {route.recordingState === "paused" ? "继续记录" : "进入记录页"}
               </Text>
+            </Pressable>
+          ) : null}
+
+          {route.status === "draft" ? (
+            <Pressable
+              style={styles.linkBtn}
+              onPress={() => router.push(`/routes/plan?id=${route.id}`)}
+            >
+              <Text style={styles.linkText}>编辑规划</Text>
             </Pressable>
           ) : null}
 
           <Pressable style={styles.deleteButton} onPress={onDelete}>
             <Text style={styles.deleteText}>删除路线</Text>
           </Pressable>
-        </ScrollView>
-      )}
+        </View>
+      </ScrollView>
     </>
   );
 }
 
 const styles = StyleSheet.create({
+  scroll: { flex: 1, backgroundColor: "#fff" },
+  content: { paddingBottom: 32 },
   loader: { marginTop: 40 },
   center: { flex: 1, alignItems: "center", justifyContent: "center" },
   error: { fontSize: 15, color: "#6e6e73" },
-  content: { padding: 24, gap: 16 },
-  title: { fontSize: 24, fontWeight: "700", color: "#1d1d1f" },
-  badge: {
-    alignSelf: "flex-start",
-    fontSize: 13,
-    fontWeight: "600",
-    color: "#0071e3",
-    backgroundColor: "rgba(0,113,227,0.08)",
-    paddingHorizontal: 10,
-    paddingVertical: 4,
-    borderRadius: 980,
+  sheet: {
+    marginTop: -20,
+    backgroundColor: "#fff",
+    borderTopLeftRadius: 18,
+    borderTopRightRadius: 18,
+    padding: 20,
+    gap: 16,
+    shadowColor: "#000",
+    shadowOpacity: 0.06,
+    shadowRadius: 12,
+    shadowOffset: { width: 0, height: -4 },
   },
-  section: {
+  drag: {
+    width: 36,
+    height: 5,
+    backgroundColor: "#d2d2d7",
+    borderRadius: 3,
+    alignSelf: "center",
+  },
+  title: { fontSize: 28, fontWeight: "700", color: "#1d1d1f" },
+  badge: { fontSize: 14, color: "#6e6e73" },
+  statsRow: {
+    flexDirection: "row",
     backgroundColor: "#f5f5f7",
-    borderRadius: 12,
-    padding: 16,
-  },
-  label: { fontSize: 13, color: "#6e6e73", marginBottom: 4 },
-  value: { fontSize: 17, color: "#1d1d1f" },
-  hint: { fontSize: 14, color: "#6e6e73", lineHeight: 20 },
-  primaryButton: {
+    borderRadius: 14,
     paddingVertical: 14,
-    alignItems: "center",
+  },
+  stat: { flex: 1, alignItems: "center" },
+  statValue: { fontSize: 18, fontWeight: "700", color: "#1d1d1f" },
+  statLabel: { marginTop: 2, fontSize: 12, color: "#6e6e73" },
+  markerScroll: { marginHorizontal: -4 },
+  miniCard: {
+    width: 140,
+    padding: 12,
+    marginRight: 10,
     borderRadius: 12,
+    backgroundColor: "#f5f5f7",
+    borderWidth: 1,
+    borderColor: "#e8e8ed",
+  },
+  miniTitle: { fontSize: 14, fontWeight: "600" },
+  miniMeta: { marginTop: 4, fontSize: 12, color: "#6e6e73" },
+  actionRow: { flexDirection: "row", gap: 12 },
+  primaryBtn: {
+    flex: 1,
     backgroundColor: "#0071e3",
-  },
-  primaryButtonText: { color: "#fff", fontSize: 15, fontWeight: "600" },
-  editButton: {
+    borderRadius: 980,
     paddingVertical: 14,
     alignItems: "center",
-    borderRadius: 12,
-    backgroundColor: "#f5f5f7",
   },
-  editText: { color: "#0071e3", fontSize: 15, fontWeight: "600" },
+  primaryBtnText: { color: "#fff", fontWeight: "600", fontSize: 16 },
+  secondaryBtn: {
+    flex: 1,
+    borderWidth: 1,
+    borderColor: "#d2d2d7",
+    borderRadius: 980,
+    paddingVertical: 14,
+    alignItems: "center",
+  },
+  secondaryBtnText: { color: "#1d1d1f", fontWeight: "600", fontSize: 16 },
+  fullBtn: {
+    backgroundColor: "#0071e3",
+    borderRadius: 980,
+    paddingVertical: 14,
+    alignItems: "center",
+  },
+  linkBtn: { alignItems: "center", paddingVertical: 8 },
+  linkText: { color: "#0071e3", fontSize: 15, fontWeight: "600" },
   deleteButton: {
-    marginTop: 8,
     paddingVertical: 14,
     alignItems: "center",
     borderRadius: 12,
