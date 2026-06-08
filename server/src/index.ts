@@ -2,8 +2,10 @@ import express from "express";
 import cors from "cors";
 import { config } from "./config.js";
 import { closeDb, pingDb } from "./db.js";
+import { ensureRouteIndexes } from "./models/route.js";
 import { ensureUserIndexes } from "./models/user.js";
 import { authRouter } from "./routes/auth.js";
+import { routesRouter } from "./routes/routes.js";
 
 const app = express();
 
@@ -21,9 +23,11 @@ app.get("/api/health", async (_req, res) => {
 });
 
 app.use("/api/auth", authRouter);
+app.use("/api/routes", routesRouter);
 
 async function bootstrap() {
   await ensureUserIndexes();
+  await ensureRouteIndexes();
   const server = app.listen(config.port, () => {
     console.log(`yejing-api listening on http://localhost:${config.port}`);
   });
