@@ -2,9 +2,11 @@ import express from "express";
 import cors from "cors";
 import { config } from "./config.js";
 import { closeDb, pingDb } from "./db.js";
+import { ensureMarkerIndexes } from "./models/marker.js";
 import { ensureRouteIndexes } from "./models/route.js";
 import { ensureUserIndexes } from "./models/user.js";
 import { authRouter } from "./routes/auth.js";
+import { markersGlobalRouter } from "./routes/markers.js";
 import { routesRouter } from "./routes/routes.js";
 
 const app = express();
@@ -24,10 +26,12 @@ app.get("/api/health", async (_req, res) => {
 
 app.use("/api/auth", authRouter);
 app.use("/api/routes", routesRouter);
+app.use("/api/markers", markersGlobalRouter);
 
 async function bootstrap() {
   await ensureUserIndexes();
   await ensureRouteIndexes();
+  await ensureMarkerIndexes();
   const server = app.listen(config.port, () => {
     console.log(`yejing-api listening on http://localhost:${config.port}`);
   });
