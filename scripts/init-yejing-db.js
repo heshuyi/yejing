@@ -16,6 +16,7 @@ db.createCollection('routes', {
       bsonType: 'object',
       required: ['name', 'status', 'createdAt', 'updatedAt'],
       properties: {
+        userId: { bsonType: 'objectId' },
         name: { bsonType: 'string' },
         status: { enum: ['draft', 'active', 'completed'] },
         isLoop: { bsonType: 'bool' },
@@ -72,6 +73,7 @@ db.createCollection('health_sessions');
 
 // ── 3. 索引 ──
 db.routes.createIndex({ status: 1, updatedAt: -1 });
+db.routes.createIndex({ userId: 1, status: 1, updatedAt: -1 });
 db.routes.createIndex({ name: 'text', startPlace: 'text', endPlace: 'text' });
 db.routes.createIndex({ startCoordinate: '2dsphere' });
 
