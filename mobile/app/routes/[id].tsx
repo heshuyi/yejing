@@ -85,10 +85,23 @@ export default function RouteDetailScreen() {
             <Text style={styles.label}>终点</Text>
             <Text style={styles.value}>{route.endPlace || "未设置"}</Text>
           </View>
+          <View style={styles.section}>
+            <Text style={styles.label}>环线</Text>
+            <Text style={styles.value}>{route.isLoop ? "是" : "否"}</Text>
+          </View>
 
           <Text style={styles.hint}>
-            完整地图、轨迹与标记详情将在后续版本提供。
+            完整地图、轨迹与标记详情将在后续版本提供。如何到达导航功能即将上线。
           </Text>
+
+          {route.status === "draft" ? (
+            <Pressable
+              style={styles.editButton}
+              onPress={() => router.push(`/routes/plan?id=${route.id}`)}
+            >
+              <Text style={styles.editText}>编辑规划</Text>
+            </Pressable>
+          ) : null}
 
           <Pressable style={styles.deleteButton} onPress={onDelete}>
             <Text style={styles.deleteText}>删除路线</Text>
@@ -123,6 +136,13 @@ const styles = StyleSheet.create({
   label: { fontSize: 13, color: "#6e6e73", marginBottom: 4 },
   value: { fontSize: 17, color: "#1d1d1f" },
   hint: { fontSize: 14, color: "#6e6e73", lineHeight: 20 },
+  editButton: {
+    paddingVertical: 14,
+    alignItems: "center",
+    borderRadius: 12,
+    backgroundColor: "#f5f5f7",
+  },
+  editText: { color: "#0071e3", fontSize: 15, fontWeight: "600" },
   deleteButton: {
     marginTop: 8,
     paddingVertical: 14,

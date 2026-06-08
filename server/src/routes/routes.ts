@@ -5,6 +5,7 @@ import {
   deleteRoute,
   findRouteForUser,
   listRoutesForUser,
+  parseGeoPoint,
   toPublicRoute,
   updateRoute,
   type RouteStatus,
@@ -19,6 +20,23 @@ const STATUSES: RouteStatus[] = ["draft", "active", "completed"];
 function routeIdParam(raw: unknown): string {
   if (Array.isArray(raw)) return String(raw[0] ?? "");
   return String(raw ?? "");
+}
+
+function parseGoalDistance(
+  value: unknown,
+): { min?: number; max?: number } | null | undefined {
+  if (value === null) return null;
+  if (!value || typeof value !== "object") return undefined;
+  const raw = value as { min?: unknown; max?: unknown };
+  const min = raw.min === undefined ? undefined : Number(raw.min);
+  const max = raw.max === undefined ? undefined : Number(raw.max);
+  if (
+    (min !== undefined && !Number.isFinite(min)) ||
+    (max !== undefined && !Number.isFinite(max))
+  ) {
+    return undefined;
+  }
+  return { min, max };
 }
 
 routesRouter.get("/", async (req: AuthedRequest, res) => {
@@ -48,9 +66,19 @@ routesRouter.get("/:id", async (req: AuthedRequest, res) => {
 });
 
 routesRouter.post("/", async (req: AuthedRequest, res) => {
-  const { name, isLoop, startPlace, endPlace } = req.body ?? {};
+  const body = req.body ?? {};
+  const { name, isLoop, startPlace, endPlace, goalDistanceKm } = body;
+
   if (typeof name !== "string" || !name.trim()) {
     res.status(400).json({ error: "请提供路线名称" });
+    return;
+  }
+
+  const startCoordinate = parseGeoPoint(body.startCoordinate);
+  const endCoordinate = parseGeoPoint(body.endCoordinate);
+  const goal = parseGoalDistance(goalDistanceKm);
+  if (goalDistanceKm !== undefined && goal === undefined) {
+    res.status(400).json({ error: "无效的目标距离" });
     return;
   }
 
@@ -59,33 +87,66 @@ routesRouter.post("/", async (req: AuthedRequest, res) => {
     isLoop: typeof isLoop === "boolean" ? isLoop : undefined,
     startPlace: typeof startPlace === "string" ? startPlace : undefined,
     endPlace: typeof endPlace === "string" ? endPlace : undefined,
+    startCoordinate,
+    endCoordinate,
+    goalDistanceKm: goal ?? undefined,
   });
 
   res.status(201).json({ route: toPublicRoute(route) });
 });
 
 routesRouter.patch("/:id", async (req: AuthedRequest, res) => {
-  const { name, status, isLoop, startPlace, endPlace } = req.body ?? {};
+  const body = req.body ?? {};
+  const { name, status, isLoop, startPlace, endPlace, goalDistanceKm } = body;
 
   if (status !== undefined && !STATUSES.includes(status)) {
     res.status(400).json({ error: "无效的状态" });
     return;
   }
 
-  const route = await updateRoute(req.user!._id, routeIdParam(req.params.id), {
+  const startCoordinate =
+    body.startCoordinate === undefined
+      ? undefined
+      : parseGeoPoint(body.startCoordinate);
+  if (body.startCoordinate !== undefined && !startCoordinate) {
+    res.status(400).json({ error: "无效的起点坐标" });
+    return;
+  }
+
+  const endCoordinate =
+    body.endCoordinate === undefined ? undefined : parseGeoPoint(body.endCoordinate);
+  if (body.endCoordinate !== undefined && !endCoordinate) {
+    res.status(400).json({ error: "无效的终点坐标" });
+    return;
+  }
+
+  const goal = parseGoalDistance(goalDistanceKm);
+  if (goalDistanceKm !== undefined && goal === undefined) {
+    res.status(400).json({ error: "无效的目标距离" });
+    return;
+  }
+
+  const result = await updateRoute(req.user!._id, routeIdParam(req.params.id), {
     name: typeof name === "string" ? name : undefined,
     status,
     isLoop: typeof isLoop === "boolean" ? isLoop : undefined,
     startPlace: typeof startPlace === "string" ? startPlace : undefined,
     endPlace: typeof endPlace === "string" ? endPlace : undefined,
+    startCoordinate,
+    endCoordinate,
+    goalDistanceKm: goal,
   });
 
-  if (!route) {
+  if (!result.ok) {
+    if (result.reason === "not_draft") {
+      res.status(409).json({ error: "仅草稿路线可编辑规划信息" });
+      return;
+    }
     res.status(404).json({ error: "路线不存在" });
     return;
   }
 
-  res.json({ route: toPublicRoute(route) });
+  res.json({ route: toPublicRoute(result.route) });
 });
 
 routesRouter.delete("/:id", async (req: AuthedRequest, res) => {

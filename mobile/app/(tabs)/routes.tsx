@@ -113,7 +113,7 @@ export default function RoutesScreen() {
   }
 
   function onPlanRoute() {
-    Alert.alert("即将开放", "规划新路线功能将在下一版 PR 中实现。");
+    router.push("/routes/plan");
   }
 
   return (

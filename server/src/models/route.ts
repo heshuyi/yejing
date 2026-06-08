@@ -43,12 +43,17 @@ export interface RouteSummary {
   updatedAt: string;
 }
 
+export interface GoalDistanceKm {
+  min?: number;
+  max?: number;
+}
+
 export interface RoutePublic extends RouteSummary {
   isLoop: boolean;
   endPlace: string | null;
   startCoordinate?: GeoPoint;
   endCoordinate?: GeoPoint;
-  goalDistanceKm?: { min?: number; max?: number };
+  goalDistanceKm?: GoalDistanceKm | null;
   stats?: RouteStats;
   startedAt: string | null;
   createdAt: string;
@@ -135,6 +140,34 @@ export async function findRouteForUser(
   });
 }
 
+export function parseGeoPoint(value: unknown): GeoPoint | undefined {
+  if (!value || typeof value !== "object") return undefined;
+  const raw = value as { type?: string; coordinates?: unknown };
+  if (raw.type !== "Point" || !Array.isArray(raw.coordinates)) return undefined;
+  if (raw.coordinates.length !== 2) return undefined;
+  const lng = Number(raw.coordinates[0]);
+  const lat = Number(raw.coordinates[1]);
+  if (!Number.isFinite(lng) || !Number.isFinite(lat)) return undefined;
+  return { type: "Point", coordinates: [lng, lat] };
+}
+
+function applyLoopFields<
+  T extends {
+    isLoop?: boolean;
+    startPlace?: string;
+    endPlace?: string;
+    startCoordinate?: GeoPoint;
+    endCoordinate?: GeoPoint;
+  },
+>(input: T): T {
+  if (!input.isLoop) return input;
+  return {
+    ...input,
+    endPlace: input.startPlace ?? input.endPlace,
+    endCoordinate: input.startCoordinate ?? input.endCoordinate,
+  };
+}
+
 export async function createRoute(
   userId: ObjectId,
   input: {
@@ -142,16 +175,23 @@ export async function createRoute(
     isLoop?: boolean;
     startPlace?: string;
     endPlace?: string;
+    startCoordinate?: GeoPoint;
+    endCoordinate?: GeoPoint;
+    goalDistanceKm?: { min?: number; max?: number };
   },
 ): Promise<RouteDoc> {
+  const normalized = applyLoopFields(input);
   const now = new Date();
   const doc: Omit<RouteDoc, "_id"> = {
     userId,
-    name: input.name.trim(),
+    name: normalized.name.trim(),
     status: "draft",
-    isLoop: input.isLoop ?? false,
-    startPlace: input.startPlace?.trim() || undefined,
-    endPlace: input.endPlace?.trim() || undefined,
+    isLoop: normalized.isLoop ?? false,
+    startPlace: normalized.startPlace?.trim() || undefined,
+    endPlace: normalized.endPlace?.trim() || undefined,
+    startCoordinate: normalized.startCoordinate,
+    endCoordinate: normalized.endCoordinate,
+    goalDistanceKm: normalized.goalDistanceKm,
     stats: { markerCount: 0, distanceKm: 0 },
     createdAt: now,
     updatedAt: now,
@@ -162,6 +202,20 @@ export async function createRoute(
   return { _id: result.insertedId, ...doc };
 }
 
+export type RouteUpdateResult =
+  | { ok: true; route: RouteDoc }
+  | { ok: false; reason: "not_found" | "not_draft" };
+
+const PLAN_FIELDS = [
+  "name",
+  "isLoop",
+  "startPlace",
+  "endPlace",
+  "startCoordinate",
+  "endCoordinate",
+  "goalDistanceKm",
+] as const;
+
 export async function updateRoute(
   userId: ObjectId,
   routeId: string,
@@ -171,22 +225,61 @@ export async function updateRoute(
     isLoop: boolean;
     startPlace: string;
     endPlace: string;
+    startCoordinate: GeoPoint;
+    endCoordinate: GeoPoint;
+    goalDistanceKm: { min?: number; max?: number } | null;
   }>,
-): Promise<RouteDoc | null> {
+): Promise<RouteUpdateResult> {
   const existing = await findRouteForUser(userId, routeId);
-  if (!existing) return null;
+  if (!existing) return { ok: false, reason: "not_found" };
+
+  const touchesPlan = PLAN_FIELDS.some((key) => patch[key] !== undefined);
+  if (touchesPlan && existing.status !== "draft") {
+    return { ok: false, reason: "not_draft" };
+  }
+
+  const merged = applyLoopFields({
+    isLoop: patch.isLoop ?? existing.isLoop,
+    startPlace:
+      typeof patch.startPlace === "string"
+        ? patch.startPlace.trim() || undefined
+        : existing.startPlace,
+    endPlace:
+      typeof patch.endPlace === "string"
+        ? patch.endPlace.trim() || undefined
+        : existing.endPlace,
+    startCoordinate: patch.startCoordinate ?? existing.startCoordinate,
+    endCoordinate: patch.endCoordinate ?? existing.endCoordinate,
+  });
 
   const updates: Partial<RouteDoc> = { updatedAt: new Date() };
   if (typeof patch.name === "string" && patch.name.trim()) {
     updates.name = patch.name.trim();
   }
   if (patch.status) updates.status = patch.status;
-  if (typeof patch.isLoop === "boolean") updates.isLoop = patch.isLoop;
-  if (typeof patch.startPlace === "string") {
-    updates.startPlace = patch.startPlace.trim() || undefined;
+  if (typeof patch.isLoop === "boolean") updates.isLoop = merged.isLoop;
+  if (typeof patch.startPlace === "string" || patch.isLoop !== undefined) {
+    updates.startPlace = merged.startPlace;
   }
-  if (typeof patch.endPlace === "string") {
-    updates.endPlace = patch.endPlace.trim() || undefined;
+  if (
+    typeof patch.endPlace === "string" ||
+    patch.isLoop !== undefined ||
+    typeof patch.startPlace === "string"
+  ) {
+    updates.endPlace = merged.endPlace;
+  }
+  if (patch.startCoordinate !== undefined || patch.isLoop !== undefined) {
+    updates.startCoordinate = merged.startCoordinate;
+  }
+  if (
+    patch.endCoordinate !== undefined ||
+    patch.isLoop !== undefined ||
+    patch.startCoordinate !== undefined
+  ) {
+    updates.endCoordinate = merged.endCoordinate;
+  }
+  if (patch.goalDistanceKm !== undefined) {
+    updates.goalDistanceKm = patch.goalDistanceKm ?? undefined;
   }
 
   const db = await connectDb();
@@ -194,7 +287,7 @@ export async function updateRoute(
     .collection<RouteDoc>("routes")
     .updateOne({ _id: existing._id, userId }, { $set: updates });
 
-  return { ...existing, ...updates };
+  return { ok: true, route: { ...existing, ...updates } };
 }
 
 export async function deleteRoute(
