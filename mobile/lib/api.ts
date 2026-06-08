@@ -79,6 +79,7 @@ export interface RouteDetail extends RouteSummary {
   startCoordinate?: GeoPoint;
   endCoordinate?: GeoPoint;
   goalDistanceKm?: GoalDistanceKm | null;
+  recordingState?: "recording" | "paused" | null;
   stats?: {
     distanceKm?: number;
     markerCount?: number;
@@ -136,6 +137,91 @@ export function deleteRoute(token: string, id: string): Promise<void> {
   return request<void>(
     `/api/routes/${id}`,
     { method: "DELETE" },
+    token,
+  );
+}
+
+export interface TrackPoint {
+  id?: string;
+  timestamp: string;
+  location: GeoPoint;
+  altitude: number | null;
+  speed: number | null;
+  accuracy: number | null;
+}
+
+export interface TrackPointInput {
+  timestamp: string;
+  location: GeoPoint;
+  altitude?: number;
+  speed?: number;
+  accuracy?: number;
+}
+
+export function startRecording(
+  token: string,
+  routeId: string,
+): Promise<{ route: RouteDetail }> {
+  return request<{ route: RouteDetail }>(
+    `/api/routes/${routeId}/recording/start`,
+    { method: "POST" },
+    token,
+  );
+}
+
+export function pauseRecording(
+  token: string,
+  routeId: string,
+): Promise<{ route: RouteDetail }> {
+  return request<{ route: RouteDetail }>(
+    `/api/routes/${routeId}/recording/pause`,
+    { method: "POST" },
+    token,
+  );
+}
+
+export function resumeRecording(
+  token: string,
+  routeId: string,
+): Promise<{ route: RouteDetail }> {
+  return request<{ route: RouteDetail }>(
+    `/api/routes/${routeId}/recording/resume`,
+    { method: "POST" },
+    token,
+  );
+}
+
+export function finishRecording(
+  token: string,
+  routeId: string,
+  durationSec: number,
+): Promise<{ route: RouteDetail }> {
+  return request<{ route: RouteDetail }>(
+    `/api/routes/${routeId}/recording/finish`,
+    { method: "POST", body: JSON.stringify({ durationSec }) },
+    token,
+  );
+}
+
+export function fetchTrackPoints(
+  token: string,
+  routeId: string,
+): Promise<{ points: TrackPoint[] }> {
+  return request<{ points: TrackPoint[] }>(
+    `/api/routes/${routeId}/track-points`,
+    {},
+    token,
+  );
+}
+
+export function uploadTrackPoints(
+  token: string,
+  routeId: string,
+  points: TrackPointInput[],
+): Promise<{ inserted: number }> {
+  return request<{ inserted: number }>(
+    `/api/routes/${routeId}/track-points`,
+    { method: "POST", body: JSON.stringify({ points }) },
     token,
   );
 }

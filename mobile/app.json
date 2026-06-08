@@ -34,7 +34,13 @@
           "backgroundColor": "#ffffff"
         }
       ],
-      "expo-secure-store"
+      "expo-secure-store",
+      [
+        "expo-location",
+        {
+          "locationWhenInUsePermission": "野径需要定位权限以记录徒步轨迹。"
+        }
+      ]
     ],
     "experiments": {
       "typedRoutes": true
