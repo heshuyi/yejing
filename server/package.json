@@ -9,7 +9,7 @@
     "build": "tsc",
     "typecheck": "tsc --noEmit",
     "test": "npm run typecheck && tsx src/lib/geo.test.ts",
-    "test:integration": "bash ../scripts/test-gps-recording.sh && bash ../scripts/test-markers.sh && bash ../scripts/test-route-detail.sh"
+    "test:integration": "bash ../scripts/test-gps-recording.sh && bash ../scripts/test-markers.sh && bash ../scripts/test-route-detail.sh && bash ../scripts/test-transit.sh"
   },
   "dependencies": {
     "bcryptjs": "^2.4.3",

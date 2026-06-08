@@ -3,6 +3,7 @@ import { requireAuth, type AuthedRequest } from "../middleware/auth.js";
 import { registerMarkerRoutes } from "./markers.js";
 import { registerRecordingRoutes } from "./recording.js";
 import { getRouteDetail } from "../models/routeDetail.js";
+import { getTransitInfo } from "../models/transit.js";
 import {
   createRoute,
   deleteRoute,
@@ -61,6 +62,19 @@ routesRouter.get("/", async (req: AuthedRequest, res) => {
 
 registerMarkerRoutes(routesRouter);
 registerRecordingRoutes(routesRouter);
+
+routesRouter.get("/:id/transit", async (req: AuthedRequest, res) => {
+  const result = await getTransitInfo(req.user!._id, routeIdParam(req.params.id));
+  if (!result.ok) {
+    if (result.reason === "no_coordinates") {
+      res.status(400).json({ error: "请先在规划中设置起终点坐标" });
+      return;
+    }
+    res.status(404).json({ error: "路线不存在" });
+    return;
+  }
+  res.json(result.transit);
+});
 
 routesRouter.get("/:id/detail", async (req: AuthedRequest, res) => {
   const detail = await getRouteDetail(req.user!._id, routeIdParam(req.params.id));
