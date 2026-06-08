@@ -90,8 +90,15 @@ export default function RouteDetailScreen() {
             <Text style={styles.value}>{route.isLoop ? "是" : "否"}</Text>
           </View>
 
+          <Pressable
+            style={styles.primaryButton}
+            onPress={() => router.push(`/routes/${route.id}/markers`)}
+          >
+            <Text style={styles.primaryButtonText}>查看标记（{route.markerCount}）</Text>
+          </Pressable>
+
           <Text style={styles.hint}>
-            完整地图、轨迹与标记详情将在后续版本提供。如何到达导航功能即将上线。
+            完整地图与轨迹详情将在后续版本提供。如何到达导航功能即将上线。
           </Text>
 
           {route.status === "draft" ? (

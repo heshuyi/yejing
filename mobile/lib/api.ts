@@ -226,6 +226,90 @@ export function uploadTrackPoints(
   );
 }
 
+export type MarkerType =
+  | "supply"
+  | "photo"
+  | "rest"
+  | "view"
+  | "fork"
+  | "other";
+
+export interface Marker {
+  id: string;
+  routeId: string;
+  routeName?: string;
+  type: MarkerType;
+  name: string;
+  note: string | null;
+  distanceFromStart: number | null;
+  coordinate: GeoPoint;
+  facing: string | null;
+  bestTime: string | null;
+  createdAt: string;
+  updatedAt: string;
+}
+
+export interface MarkerInput {
+  type: MarkerType;
+  name: string;
+  note?: string;
+  coordinate: GeoPoint;
+  facing?: string;
+  bestTime?: string;
+}
+
+export function fetchRouteMarkers(
+  token: string,
+  routeId: string,
+  type?: MarkerType,
+): Promise<{ markers: Marker[] }> {
+  const qs = type ? `?type=${type}` : "";
+  return request<{ markers: Marker[] }>(
+    `/api/routes/${routeId}/markers${qs}`,
+    {},
+    token,
+  );
+}
+
+export function fetchAllMarkers(
+  token: string,
+  params: { routeId?: string; type?: MarkerType } = {},
+): Promise<{ markers: Marker[] }> {
+  const search = new URLSearchParams();
+  if (params.routeId) search.set("routeId", params.routeId);
+  if (params.type) search.set("type", params.type);
+  const qs = search.toString();
+  return request<{ markers: Marker[] }>(
+    `/api/markers${qs ? `?${qs}` : ""}`,
+    {},
+    token,
+  );
+}
+
+export function createMarker(
+  token: string,
+  routeId: string,
+  input: MarkerInput,
+): Promise<{ marker: Marker }> {
+  return request<{ marker: Marker }>(
+    `/api/routes/${routeId}/markers`,
+    { method: "POST", body: JSON.stringify(input) },
+    token,
+  );
+}
+
+export function deleteMarker(
+  token: string,
+  routeId: string,
+  markerId: string,
+): Promise<void> {
+  return request<void>(
+    `/api/routes/${routeId}/markers/${markerId}`,
+    { method: "DELETE" },
+    token,
+  );
+}
+
 export function registerUser(input: {
   email: string;
   password: string;

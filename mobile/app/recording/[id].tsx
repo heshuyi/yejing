@@ -14,6 +14,7 @@ import { useSafeAreaInsets } from "react-native-safe-area-context";
 import { useAuth } from "@/contexts/AuthContext";
 import { useGpsRecording } from "@/hooks/useGpsRecording";
 import {
+  createMarker,
   fetchRoute,
   fetchTrackPoints,
   finishRecording,
@@ -211,6 +212,30 @@ export default function RecordingScreen() {
           </View>
         </View>
 
+        <Pressable
+          style={styles.markerBtn}
+          onPress={async () => {
+            if (!token || !id) return;
+            const last = gps.points[gps.points.length - 1];
+            if (!last) {
+              Alert.alert("暂无位置", "请等待 GPS 采样后再添加标记");
+              return;
+            }
+            try {
+              await createMarker(token, id, {
+                type: "supply",
+                name: `标记点 ${gps.points.length}`,
+                coordinate: last.location,
+              });
+              Alert.alert("已添加标记");
+            } catch (e) {
+              Alert.alert("添加失败", e instanceof Error ? e.message : "请稍后重试");
+            }
+          }}
+        >
+          <Text style={styles.markerBtnText}>＋ 添加当前位置标记</Text>
+        </Pressable>
+
         <View style={styles.actions}>
           <Pressable
             style={[styles.secondaryBtn, busy && styles.btnDisabled]}
@@ -277,6 +302,15 @@ const styles = StyleSheet.create({
   metric: { flex: 1, alignItems: "center" },
   metricValue: { fontSize: 24, fontWeight: "700", color: "#1d1d1f" },
   metricLabel: { marginTop: 4, fontSize: 12, color: "#6e6e73" },
+  markerBtn: {
+    borderWidth: 1,
+    borderColor: "#0071e3",
+    borderRadius: 12,
+    paddingVertical: 12,
+    alignItems: "center",
+    backgroundColor: "rgba(0,113,227,0.04)",
+  },
+  markerBtnText: { color: "#0071e3", fontSize: 15, fontWeight: "600" },
   actions: { gap: 12, marginTop: 8 },
   primaryBtn: {
     backgroundColor: "#0071e3",

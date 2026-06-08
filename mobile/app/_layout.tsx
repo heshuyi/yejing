@@ -69,6 +69,7 @@ function RootLayoutNav() {
         <Stack.Screen name="(auth)" options={{ headerShown: false }} />
         <Stack.Screen name="routes/plan" options={{ title: "规划新路线" }} />
         <Stack.Screen name="routes/[id]" options={{ title: "路线详情" }} />
+        <Stack.Screen name="routes/[id]/markers" options={{ title: "路线标记" }} />
         <Stack.Screen name="recording/[id]" options={{ title: "记录中" }} />
         <Stack.Screen name="modal" options={{ presentation: 'modal' }} />
       </Stack>
