@@ -101,7 +101,7 @@
 | `track_points` | GPS 轨迹点 |
 | `health_sessions` | Watch 健康数据 |
 
-待 `user-auth` 设计补充：`users` 集合；`routes` 增加 `userId`。
+`routes` 已增加 `userId` 字段（`routes-crud` 起新建路线必填）。
 
 ## GitHub 推送备忘
 

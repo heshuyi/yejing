@@ -36,12 +36,13 @@
 |------|------|------|------|
 | 7 | `pr-workflow` | 本指南 + Skill 中文 PR 规范 | ✅ |
 | 8–9 | `user-auth` | 用户认证（设计 → 实现） | ✅ |
+| 11–12 | `routes-crud` | 路线库 CRUD（设计 → 实现） | ✅ |
 
 ## 下一步
 
 | slug | 说明 |
 |------|------|
-| `routes-crud` | 路线 CRUD（设计 → 实现） |
+| `plan-route` | 规划新路线（起终点、环线） |
 | 更多 | 见 `.cursor/skills/yejing-pr-driven-dev/reference.md` |
 
 ## 你怎么参与（可选）
