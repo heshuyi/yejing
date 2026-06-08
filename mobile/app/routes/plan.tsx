@@ -167,7 +167,7 @@ export default function PlanRouteScreen() {
       }
 
       if (andPlanTransit) {
-        router.replace(`/routes/${routeId}`);
+        router.replace(`/routes/${routeId}/transit`);
       } else {
         router.replace("/(tabs)/routes");
       }

@@ -132,6 +132,27 @@ export function fetchRouteDetail(
   return request<RouteDetailAggregate>(`/api/routes/${id}/detail`, {}, token);
 }
 
+export interface TransitEndpoint {
+  place: string | null;
+  coordinate: GeoPoint | null;
+}
+
+export interface TransitInfo {
+  routeId: string;
+  routeName: string;
+  isLoop: boolean;
+  loopHint: string | null;
+  start: TransitEndpoint;
+  end: TransitEndpoint;
+}
+
+export function fetchRouteTransit(
+  token: string,
+  id: string,
+): Promise<TransitInfo> {
+  return request<TransitInfo>(`/api/routes/${id}/transit`, {}, token);
+}
+
 export function createRoute(
   token: string,
   input: RoutePlanInput,
