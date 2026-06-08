@@ -2,6 +2,7 @@ import { Router } from "express";
 import { requireAuth, type AuthedRequest } from "../middleware/auth.js";
 import { registerMarkerRoutes } from "./markers.js";
 import { registerRecordingRoutes } from "./recording.js";
+import { getRouteDetail } from "../models/routeDetail.js";
 import {
   createRoute,
   deleteRoute,
@@ -60,6 +61,15 @@ routesRouter.get("/", async (req: AuthedRequest, res) => {
 
 registerMarkerRoutes(routesRouter);
 registerRecordingRoutes(routesRouter);
+
+routesRouter.get("/:id/detail", async (req: AuthedRequest, res) => {
+  const detail = await getRouteDetail(req.user!._id, routeIdParam(req.params.id));
+  if (!detail) {
+    res.status(404).json({ error: "路线不存在" });
+    return;
+  }
+  res.json(detail);
+});
 
 routesRouter.get("/:id", async (req: AuthedRequest, res) => {
   const route = await findRouteForUser(req.user!._id, routeIdParam(req.params.id));
